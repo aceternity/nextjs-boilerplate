@@ -12,12 +12,12 @@ datasource db {
 }
 
 enum Role {
-  USER
-  ADMIN
+  superadmin
+  customer
 }
 
 model Account {
-  id                String   @id @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -29,7 +29,8 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
@@ -42,20 +43,74 @@ model Session {
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
   password      String?
-  email         String?        @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role           @default(USER)
+  role          Role      @default(customer)
 }
 
 model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+
   @@unique([identifier, token])
+}
+
+model Product {
+  id String @id @default(cuid())
+
+  productId String @unique
+
+  name String
+
+  active Boolean @default(false)
+
+  defaultPriceId String?       @unique
+  defaultPrice   ProductPrice? @relation(name: "defaultPrice", fields: [defaultPriceId], references: [priceId])
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  updateAt DateTime @default(now())
+
+  prices ProductPrice[] @relation(name: "prices")
+
+  @@index([productId])
+}
+
+model ProductPrice {
+  id String @id @default(cuid())
+
+  priceId String @unique
+
+  productId String
+  product   Product @relation(name: "prices", fields: [productId], references: [productId], onDelete: Cascade)
+
+  active      Boolean @default(false)
+  description String
+
+  currency String @default("USD")
+
+  type String
+
+  interval  String?
+
+  interval_count  Int?
+
+  unitAmount Float
+
+  createdAt DateTime @default(now())
+
+  updateAt DateTime @default(now())
+
+  defaultPrice Product? @relation(name: "defaultPrice")
+
+  @@index([priceId, productId])
 }
