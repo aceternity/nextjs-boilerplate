@@ -1,13 +1,13 @@
 module.exports = (plop) => {
   // create your generators here
-  plop.setGenerator('basics', {
+  plop.setGenerator('component', {
       description: 'Nextjs Boilerplate',
       prompts: [
         {
           type: 'input',
           name: 'name',
           message: 'Enter component name?',
-        },
+        }
       ], // array of inquirer prompts
       actions: [
         {
