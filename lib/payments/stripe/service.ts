@@ -10,11 +10,11 @@ export class StripeService {
     });
   }
 
-  public static getInstance(secretKey: string): StripeService {
+  public static getInstance(secretKey: string): Stripe {
     if (!StripeService.instance) {
       StripeService.instance = new StripeService(secretKey);
     }
-    return StripeService.instance;
+    return StripeService.instance.stripe;
   }
 
   public getStripe(): Stripe {

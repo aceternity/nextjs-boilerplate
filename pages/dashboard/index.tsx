@@ -1,6 +1,7 @@
-import { MainLayout } from '@components/index';
-import { NextPage } from 'next';
 import React from 'react'
+
+import { NextPage } from 'next';
+import { MainLayout } from '@components/index';
 
 const Dashboard: NextPage = () => {
   return (
