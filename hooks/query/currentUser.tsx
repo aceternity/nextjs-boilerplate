@@ -1,9 +1,13 @@
 import AxoisClient from "@lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { AxiosResponse } from "axios";
+import toast from 'react-hot-toast';
+
 import { queryClient } from "@pages/_app";
 import { UserData } from "@pages/api/users/currentUser";
 import { ProfileFormValues } from "@components/forms/ProfileForm/ProfileForm";
+import { ChangePasswordFormValues } from "@components/forms/ChangePasswordForm/ChangePasswordForm";
+
 
 const useUser = () => {
   const { data, isLoading, error } = useQuery(
@@ -17,7 +21,7 @@ const useUser = () => {
     }
   );
 
-  const { mutate, isLoading: isUpdateLoading } = useMutation(
+  const { mutateAsync, isLoading: isUpdateLoading } = useMutation(
     (updatedData: ProfileFormValues) => {
       return AxoisClient.getInstance().patch('api/users/currentUser', { ...updatedData });
     },
@@ -29,7 +33,12 @@ const useUser = () => {
   );
 
   const updateUser = (user: ProfileFormValues) => {
-    mutate(user);
+    const promise = mutateAsync(user);
+    toast.promise(promise, {
+      loading: 'Updating profile...',
+      success: 'Profile updated successfully!',
+      error: 'Failed to update profile.',
+    });
   };
 
   return {
@@ -41,6 +50,30 @@ const useUser = () => {
   };
 };
 
+const useUpdatePassword = () => {
+  const { mutateAsync, isLoading: isUpdateLoading, error } = useMutation(
+    (updatedData: ChangePasswordFormValues) => {
+      return AxoisClient.getInstance().patch('api/auth/change-password', { ...updatedData });
+    }
+  );
+
+  const updatePassword = async (updatedData: ChangePasswordFormValues) => {
+    const promise = mutateAsync(updatedData);
+    toast.promise(promise, {
+      loading: 'Updating password...',
+      success: 'Password updated successfully!',
+      error: (err) => `${err.response.data.message || 'something went wrong!'}`,
+    });
+  };
+
+  return {
+    updatePassword,
+    isUpdateLoading,
+    error,
+  };
+}
+
 export {
-  useUser
+  useUser,
+  useUpdatePassword
 };

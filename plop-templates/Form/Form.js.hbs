@@ -1,14 +1,28 @@
 import React from 'react';
+import { useForm, FormProvider, Controller } from 'react-hook-form';
+
+export type {{pascalCase name}}Values = {
+
+};
 
 interface {{pascalCase name}}Props {
-    
+  onSubmit: (updatedValues: {{pascalCase name}}Values) => void;
+  loading?: boolean;
 }
 
 const {{pascalCase name}}: React.FC<{{pascalCase name}}Props> = (props: {{pascalCase name}}Props) => {
+  const { onSubmit, loading } = props;
+
+  const methods = useForm<{{pascalCase name}}Values>({
+    defaultValues: {},
+  });
+
   return (
-    <div>
-      {{pascalCase name}}
-    </div>
+    <FormProvider {...methods}>
+      <form onSubmit={methods.handleSubmit(onSubmit)}>
+        {{pascalCase name}}
+      </form>
+    </FormProvider>
   );
 };
 

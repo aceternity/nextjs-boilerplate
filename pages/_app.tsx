@@ -9,6 +9,7 @@ import '../styles/globals.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Role } from '@prisma/client';
 import AuthGuard from '@components/AuthGuard';
+import { Toaster } from 'react-hot-toast';
 
 export type NextPageWithProps<P = {}, IP = P> = NextPage<P, IP> & {
   requireAuth?: boolean,
@@ -20,7 +21,7 @@ export type AppPropsWithExtra<P> = AppProps<P> & {
 };
 
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 
 const App = ({ Component, pageProps }: AppPropsWithExtra<{ session: Session; }>) => {
@@ -35,6 +36,7 @@ const App = ({ Component, pageProps }: AppPropsWithExtra<{ session: Session; }>)
           ) : (
             <Component {...pageProps} />
           )}
+          <Toaster />
       </SessionProvider>
     </QueryClientProvider>
   );

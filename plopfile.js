@@ -123,19 +123,19 @@ module.exports = (plop) => {
         type: 'add',
         path: 'components/forms/{{pascalCase name}}/{{pascalCase name}}.tsx',
         templateFile:
-          'plop-templates/Component/Component.js.hbs',
+          'plop-templates/Form/Form.js.hbs',
       },
       {
         type: 'add',
         path:
           'components/forms/{{pascalCase name}}/{{pascalCase name}}.module.css',
         templateFile:
-          'plop-templates/Component/Component.module.css.hbs',
+          'plop-templates/Form/Form.module.css.hbs',
       },
       {
         type: 'add',
         path: 'components/forms/{{pascalCase name}}/index.ts',
-        templateFile: 'plop-templates/Component/index.js.hbs',
+        templateFile: 'plop-templates/Form/index.js.hbs',
       },
       {
         // Adds an index.js file if it does not already exist
