@@ -113,6 +113,7 @@ model ProductPrice {
   updateAt DateTime @default(now())
 
   defaultPrice Product?       @relation(name: "defaultPrice")
+
   subscriptions Subscription[]
 
   @@index([priceId, productId])
@@ -123,19 +124,21 @@ model Subscription {
 
   subscriptionId String @unique
 
-  customer User? @relation(fields: [customerId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
-  customerId String
+  userId String
 
-  product Product @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [productId])
 
   productId String
 
-  price ProductPrice @relation(fields: [priceId], references: [id])
+  price ProductPrice @relation(fields: [priceId], references: [priceId])
 
   priceId String
 
   status SubscriptionStatus @default(active)
+
+  paymentCustomerId  String?
 
   startDate DateTime @default(now())
 
@@ -153,4 +156,8 @@ enum SubscriptionStatus {
   canceled
   paused
   incomplete
+  incomplete_expired
+  past_due
+  trialing
+  unpaid
 }

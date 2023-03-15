@@ -36,6 +36,12 @@ handler.post(async (
         quantity: 1,
       }
     ],
+    subscription_data: {
+      metadata: {
+        userId: user?.id || null,
+        email: user?.email || null,
+      }
+    },
     success_url: `${req.headers.origin}/pricing`,
     cancel_url: `${req.headers.origin}/pricing`,
   };

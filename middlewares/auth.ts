@@ -8,7 +8,7 @@ export type NextApiRequestWithSession = NextApiRequest & {
 };
 
 const AuthMiddleWare = (roles: string[]) => {
-    return async (req: NextApiRequestWithSession, res: NextApiResponse, next: NextHandler) => {
+  return async (req: NextApiRequestWithSession, res: NextApiResponse, next: NextHandler) => {
 
     if (roles.length === 0) {
       next();

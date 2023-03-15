@@ -27,8 +27,15 @@ export const nextAuthOptions: NextAuthOptions = {
       }
       return token;
     },
-    session: (params) => {
+    session: async (params) => {
       const { session } = params;
+      const user = await prisma.user.findUnique({ 
+        where: {
+          email: session.user.email as string
+        }
+      })
+      session.user.role = user?.role as string;
+      session.user.id = user?.id as string;
       return session;
     },
   },
