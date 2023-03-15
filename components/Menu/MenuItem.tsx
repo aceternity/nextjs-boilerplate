@@ -20,10 +20,11 @@ const MenuItem = (props: MenuItemProps) => {
 
   const { icon, title } = item;
 
+  const active = router.pathname.includes(item.url);
   const liClasses = classNames(
     'flex w-full p-2 justify-between cursor-pointer items-center mb-2', {
-    "text-gray-300 hover:text-gray-500": router.pathname !== item.url,
-    "bg-white text-gray-800 hover:text-gray-900": router.pathname === item.url,
+    "text-gray-300 hover:text-gray-500": !active,
+    "bg-white text-gray-800 hover:text-gray-900": active,
   });
 
   return (
