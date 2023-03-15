@@ -27,6 +27,8 @@ const Tab = (props: TabProps) => {
   const router = useRouter();
 
   const { title, route } = item;
+
+  const isActive = (activeTab === currentTab || route === router.pathname);
   return (
     <>
       <li onClick={() => {
@@ -38,8 +40,8 @@ const Tab = (props: TabProps) => {
       }}>
         <button 
           className={classNames(
-            "inline-block p-4 border-b-2 border-transparent rounded-t-l hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300",
-            activeTab === currentTab && "border-black"
+            "inline-block p-4 border-b-2 rounded-t-l hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300",
+            isActive ? "border-black": "border-transparent"
           )}
           type="button" 
           role="tab" 

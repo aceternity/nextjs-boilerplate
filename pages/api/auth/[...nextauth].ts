@@ -32,6 +32,10 @@ export const nextAuthOptions: NextAuthOptions = {
       const user = await prisma.user.findUnique({ 
         where: {
           email: session.user.email as string
+        },
+        select: {
+          role: true,
+          id: true,
         }
       })
       session.user.role = user?.role as string;
