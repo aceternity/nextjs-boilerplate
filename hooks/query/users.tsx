@@ -23,5 +23,5 @@ const useUsers = () => {
 };
 
 export {
-  useUsers
+  useUsers,
 };

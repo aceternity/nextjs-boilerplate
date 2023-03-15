@@ -26,12 +26,14 @@
     "nodemailer": "^6.9.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.43.5",
     "react-icons": "^4.8.0",
     "stripe": "^11.14.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/mailgun-js": "^0.22.13",
+    "@types/next": "^9.0.0",
     "@types/node": "18.11.3",
     "@types/nodemailer": "^6.4.7",
     "@types/react": "18.0.21",

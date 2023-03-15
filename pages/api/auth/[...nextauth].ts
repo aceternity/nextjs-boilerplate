@@ -36,8 +36,11 @@ export const nextAuthOptions: NextAuthOptions = {
         select: {
           role: true,
           id: true,
+          name: true,
         }
-      })
+      });
+
+      session.user.name = user?.name as string;
       session.user.role = user?.role as string;
       session.user.id = user?.id as string;
       return session;

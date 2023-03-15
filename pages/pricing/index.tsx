@@ -6,13 +6,10 @@ import AxoisClient from '@lib/axios';
 import getStripe from '@lib/payments/stripe';
 import { AxiosResponse } from 'axios';
 import { CheckoutData } from '@pages/api/checkout';
+import { NextPageWithProps } from '@pages/_app';
 
-const PrcingPage = () => {
+const PrcingPage: NextPageWithProps = () => {
   const { isLoading, data } = usePlans();
-
-  if (isLoading) {
-    return <>Loading</>
-  }
 
   const onClickSubscribe = async (priceId: string | undefined) => {
     const { data: { session } }: AxiosResponse<CheckoutData> = await AxoisClient.getInstance().post('api/checkout', {
@@ -28,6 +25,7 @@ const PrcingPage = () => {
   return (
     <MainLayout>
       <>
+        {isLoading && <>Loading...</>}
         {data && <PricingTable onClickSubscribe={onClickSubscribe} data={data.plans} />}
       </>
     </MainLayout>

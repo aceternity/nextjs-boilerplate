@@ -1,4 +1,5 @@
 import React, { HTMLProps } from 'react';
+import classNames from 'classnames';
 
 interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, 'size'> {
   variant?: 'primary' | 'secondary' | 'warning';
@@ -8,10 +9,11 @@ interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, 'size'> {
   type?: 'button' | 'submit' | 'reset';
   loading?: boolean;
   disabled?: boolean;
+  fullWidth?: boolean;
 };
 
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
-  const { variant, onClick, children, size, loading, ...restProps } = props;
+  const { variant, onClick, children, size, type, loading,fullWidth, ...restProps } = props;
   const getVariantClasses = () => {
     switch (variant) {
       case 'secondary':
@@ -37,9 +39,14 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
   return (
     <button
       {...restProps}
-      type="button"
+      type={type}
       onClick={onClick}
-      className={`px-4 py-2 rounded-md font-medium transition duration-200 focus:outline-none ${getVariantClasses()} ${getSizeClasses()}`}
+      className={classNames(
+        `px-4 py-2 rounded-md font-medium transition duration-200 focus:outline-none`,
+        getVariantClasses(),
+        getSizeClasses(),
+        fullWidth ? 'w-full': 'w-fit'
+      )}
     >
       {children}
     </button>

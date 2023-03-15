@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-import classNames from 'classNames';
+import classNames from 'classnames';
 import Link from 'next/link';
 
 export type IMenuItem = {

@@ -3,7 +3,7 @@ import { NextPage } from 'next';
 
 import { MainLayout, Table } from '@components/index';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useUsers } from '@hooks/query/user';
+import { useUsers } from '@hooks/query/users';
 import { UserData } from '@pages/api/users';
 
 const Users: NextPage = () => {

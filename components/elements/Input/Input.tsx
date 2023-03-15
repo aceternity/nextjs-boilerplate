@@ -1,15 +1,17 @@
 import React, { HTMLProps } from 'react';
-import classNames from 'classNames';
+import classNames from 'classnames';
 
 interface InputProps extends Omit<HTMLProps<HTMLInputElement>, 'size'> {
   variant?: 'outline' | 'filled';
   size?: 'sm' | 'md' | 'lg';
-  name: string;
+  name?: string;
   label?: string;
   placeholder?: string;
   defaultValue?: string;
   type?: string;
   error?: string;
+  fullWidth?: boolean;
+  value?: string | number | any; 
 }
 
 const Input = (props: InputProps) => {
@@ -23,6 +25,7 @@ const Input = (props: InputProps) => {
     type, 
     defaultValue,
     error,
+    fullWidth,
     ...restProps
   } = props;
   const getVariantClasses = () => {
@@ -60,7 +63,8 @@ const Input = (props: InputProps) => {
           getVariantClasses(),
           getSizeClasses(),
           disabled ? 'opacity-50 cursor-not-allowed' : '',
-          error ? 'border-red-400 placeholder-red-400': ''
+          error ? 'border-red-400 placeholder-red-400': '',
+          fullWidth ? 'w-full': ''
         )}
         disabled={disabled}
       />
