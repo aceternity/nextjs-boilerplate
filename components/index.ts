@@ -1,4 +1,5 @@
 /* PLOP_INJECT_IMPORT */
+import Dialog from './Dialog';
 import AuthGuard from './AuthGuard';
 import Flex from './Flex';
 import Tabs from './Tabs';
@@ -9,6 +10,7 @@ import MainLayout from './layouts/MainLayout';
 
 export {
   /* PLOP_INJECT_EXPORT */
+	Dialog,
 	AuthGuard,
 	Flex,
 	Tabs,
