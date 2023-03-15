@@ -10,6 +10,8 @@ import { SlOrganization } from 'react-icons/sl';
 
 import { TfiLayoutListThumb } from 'react-icons/tfi';
 
+import { FaRegListAlt } from 'react-icons/fa';
+
 const menu: IMenuItem[] = [
   {
     icon: <RxDashboard />,
@@ -22,6 +24,12 @@ const menu: IMenuItem[] = [
     title: 'Pricing',
     key: 'pricing',
     url: '/pricing',
+  },
+  {
+    icon: <FaRegListAlt />,
+    title: 'Products',
+    key: 'products',
+    url: '/products',
   },
   {
     icon: <SlOrganization />,
