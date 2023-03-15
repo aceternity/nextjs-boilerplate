@@ -26,6 +26,7 @@
       "@constants/*": ["constants/*"],
       "@hooks/*": ["hooks/*"],
       "@pages/*": ["pages/*"],
+      "@errors/*": ["errors/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
