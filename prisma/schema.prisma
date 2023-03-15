@@ -43,15 +43,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
   password      String?
-  email         String?   @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role      @default(customer)
+  role          Role           @default(customer)
+  subscriptions  Subscription[]
 }
 
 model VerificationToken {
@@ -80,7 +81,8 @@ model Product {
 
   updateAt DateTime @default(now())
 
-  prices ProductPrice[] @relation(name: "prices")
+  prices       ProductPrice[] @relation(name: "prices")
+  subscriptions Subscription[]
 
   @@index([productId])
 }
@@ -100,9 +102,9 @@ model ProductPrice {
 
   type String
 
-  interval  String?
+  interval String?
 
-  interval_count  Int?
+  interval_count Int?
 
   unitAmount Float
 
@@ -110,7 +112,45 @@ model ProductPrice {
 
   updateAt DateTime @default(now())
 
-  defaultPrice Product? @relation(name: "defaultPrice")
+  defaultPrice Product?       @relation(name: "defaultPrice")
+  subscriptions Subscription[]
 
   @@index([priceId, productId])
+}
+
+model Subscription {
+  id String @id @default(cuid())
+
+  subscriptionId String @unique
+
+  customer User? @relation(fields: [customerId], references: [id])
+
+  customerId String
+
+  product Product @relation(fields: [productId], references: [id])
+
+  productId String
+
+  price ProductPrice @relation(fields: [priceId], references: [id])
+
+  priceId String
+
+  status SubscriptionStatus @default(active)
+
+  startDate DateTime @default(now())
+
+  endDate DateTime?
+
+  createdAt DateTime @default(now())
+
+  updateAt DateTime @default(now())
+
+  @@index([subscriptionId])
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  paused
+  incomplete
 }
