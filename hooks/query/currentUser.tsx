@@ -7,6 +7,8 @@ import { queryClient } from "@pages/_app";
 import { UserData } from "@pages/api/users/currentUser";
 import { ProfileFormValues } from "@components/forms/ProfileForm/ProfileForm";
 import { ChangePasswordFormValues } from "@components/forms/ChangePasswordForm/ChangePasswordForm";
+import { LoginFormValues } from "@components/forms/LoginForm/LoginForm";
+import { signIn } from "next-auth/react";
 
 
 const useUser = () => {
@@ -73,7 +75,39 @@ const useUpdatePassword = () => {
   };
 }
 
+const useSignIn = () => {
+  const { mutateAsync, isLoading, error } = useMutation(
+    async (data: LoginFormValues) => {
+      const response = await signIn("credentials", {
+        redirect: false,
+        username: data.username,
+        password: data.password
+      });
+
+      if (response?.error) {
+        throw new Error(response.error)
+      }
+    }
+  );
+
+  const login = async (data: LoginFormValues) => {
+    const promise = mutateAsync(data);
+    toast.promise(promise, {
+      loading: 'Please wait...',
+      success: null,
+      error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
+    });
+  };
+
+  return {
+    login,
+    isLoading,
+    error,
+  };
+}
+
 export {
   useUser,
-  useUpdatePassword
+  useUpdatePassword,
+  useSignIn
 };

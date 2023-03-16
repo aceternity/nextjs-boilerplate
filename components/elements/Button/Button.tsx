@@ -10,10 +10,11 @@ interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, 'size'> {
   loading?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
+  classes?: string;
 };
 
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
-  const { variant, onClick, children, size, type, loading,fullWidth, ...restProps } = props;
+  const { variant, onClick, children, size, type, loading,fullWidth, classes, ...restProps } = props;
   const getVariantClasses = () => {
     switch (variant) {
       case 'secondary':
@@ -42,10 +43,11 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
       type={type}
       onClick={onClick}
       className={classNames(
+        classes,
         `px-4 py-2 rounded-md font-medium transition duration-200 focus:outline-none`,
         getVariantClasses(),
         getSizeClasses(),
-        fullWidth ? 'w-full': 'w-fit'
+        fullWidth ? 'w-full': 'w-fit',
       )}
     >
       {children}

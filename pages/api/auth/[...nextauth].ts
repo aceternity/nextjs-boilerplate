@@ -15,11 +15,13 @@ export const nextAuthOptions: NextAuthOptions = {
   secret: process.env.SECRET,
   debug: false,
   pages: {
+    signIn: '/auth/login',
   },
   session: {
     strategy: 'jwt',
   },
   callbacks: {
+
     jwt: async (params) => {
       const { user, token } = params;
       if (user) {
@@ -60,7 +62,7 @@ export const nextAuthOptions: NextAuthOptions = {
       authorize: (credentials, _req): Awaitable<NextAuthUser | null> => {
         return new Promise(async (resolve, reject) => {
           if (!credentials?.username) {
-            throw Error("Username empty");
+            return reject(new Error('Username empty'))
           }
 
           const user: User | null = await prisma.user.findUnique({
@@ -70,13 +72,13 @@ export const nextAuthOptions: NextAuthOptions = {
           });
 
           if (!user || user.password) {
-            throw Error("Invalid credentials");
+            return reject(new Error('Invalid credentials'))
           }
 
           const isValid = await HashUtil.compareHash(credentials.password, user.password as string);
 
           if (!isValid) {
-            throw Error("Invalid credentials");
+            return reject(new Error('Invalid credentials'))
           }
 
           resolve({

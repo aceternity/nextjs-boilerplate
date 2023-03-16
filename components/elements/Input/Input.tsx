@@ -50,7 +50,7 @@ const Input = (props: InputProps) => {
 
   return (
     <div>
-      {label && <label htmlFor={name} className={classNames('capitalize text-sm', error && 'text-red-500')}>{label}</label>}
+      {label && <label htmlFor={name} className={classNames('capitalize block mb-2 text-sm font-medium text-gray-900 dark:text-white', error && 'text-red-500')}>{label}</label>}
       <input
         {...restProps}
         type={type}
@@ -68,7 +68,7 @@ const Input = (props: InputProps) => {
         )}
         disabled={disabled}
       />
-      {error && <span className="text-red-500 text-sm">{error}</span>}
+      {error && <span className="text-red-500 text-xs">{error}</span>}
     </div>
   );
 };

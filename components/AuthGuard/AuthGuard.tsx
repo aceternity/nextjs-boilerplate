@@ -28,6 +28,11 @@ const AuthGuard: React.FC<AuthGuardProps> = (props: AuthGuardProps) => {
     return <h1>Loading...</h1>;
   }
 
+
+  if (status === 'unauthenticated') {
+    router.replace("/auth/login");
+  }
+  
   if (status === 'authenticated') {
     const { role: currentUserRole } = session?.user;
     if (!roles) return <>{children}</>;
@@ -37,10 +42,6 @@ const AuthGuard: React.FC<AuthGuardProps> = (props: AuthGuardProps) => {
     } else {
       router.replace("/403");
     }
-  }
-
-  if (status === 'unauthenticated') {
-    router.replace("/login");
   }
 
   return <></>;

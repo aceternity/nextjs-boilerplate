@@ -33,9 +33,9 @@ const menu: IMenuItem[] = [
   },
   {
     icon: <SlOrganization />,
-    title: 'Organisations',
-    key: 'organisations',
-    url: '/organisations',
+    title: 'Organizations',
+    key: 'organizations',
+    url: '/organizations',
   },
   {
     icon: <HiOutlineUsers />,
