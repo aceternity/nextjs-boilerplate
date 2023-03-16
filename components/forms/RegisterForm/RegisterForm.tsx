@@ -40,7 +40,6 @@ const RegisterForm: React.FC<RegisterFormProps> = (props: RegisterFormProps) => 
   });
 
   const handleSubmit = (values: RegisterFormValues) => {
-    methods
     onSubmit(values, methods)
   }
 
