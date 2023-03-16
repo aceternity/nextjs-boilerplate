@@ -12,6 +12,11 @@ import { TfiLayoutListThumb } from 'react-icons/tfi';
 
 import { FaRegListAlt } from 'react-icons/fa';
 
+import { RiLogoutCircleLine } from 'react-icons/ri';
+import { Button } from '@components/elements';
+import Flex from '@components/Flex';
+import { signOut } from 'next-auth/react';
+
 const menu: IMenuItem[] = [
   {
     icon: <RxDashboard />,
@@ -65,7 +70,13 @@ const MainLayout = (props: MainLayoutProps) => {
               </div>
               <Menu items={menu} />
           </div>
-          <div className="px-8 border-t border-gray-700">
+          <div className="px-8 border-t flex py-4 justify-center border-gray-700">
+            <Button variant='danger' size="sm" onClick={() => signOut({ redirect: true, callbackUrl: '/' })}>
+              <Flex alignItems="center" gap="2" justifyContent="center">
+                <RiLogoutCircleLine />
+                Logout
+              </Flex>
+            </Button>
           </div>
       </div>
       <div className="w-64 p-2 z-40 hidden h-screen absolute overflow-hidden bg-gray-800 shadow md:h-full flex-col justify-between sm:hidden  transition duration-150 ease-in-out" id="mobile-nav">

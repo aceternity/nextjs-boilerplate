@@ -31,6 +31,7 @@ const AuthGuard: React.FC<AuthGuardProps> = (props: AuthGuardProps) => {
 
   if (status === 'unauthenticated') {
     router.replace("/auth/login");
+    return <></>;
   }
   
   if (status === 'authenticated') {

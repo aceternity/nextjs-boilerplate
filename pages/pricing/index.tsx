@@ -32,4 +32,5 @@ const PrcingPage: NextPageWithProps = () => {
   )
 }
 
+PrcingPage.requireAuth = true;
 export default PrcingPage;

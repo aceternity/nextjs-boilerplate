@@ -18,6 +18,7 @@ export interface Plan {
   defaultPriceId: string | null;
   description: string | null;
   prices: Price[];
+  uniqueIdentifier: string;
 }
 
 export type PlansData = {
@@ -40,6 +41,7 @@ export default async function handler(
       active: true,
       defaultPriceId: true,
       description: true,
+      uniqueIdentifier: true,
       prices: {
         where: {
           active: true,

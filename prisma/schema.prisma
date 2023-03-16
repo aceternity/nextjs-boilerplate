@@ -52,7 +52,24 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role           @default(customer)
-  subscriptions  Subscription[]
+  subscriptions Subscription[]
+
+  organizations Organization[]
+  invitations   OrganizationMemberInvitation[]
+
+  memberInOrganizations OrganizationMember[]
+
+  resetToken    PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id         String         @id @default(cuid())
+  expires    DateTime
+
+  token      String   @unique
+
+  userId     String
+  user       User  @relation(fields: [userId], references: [id])
 }
 
 model VerificationToken {
@@ -63,12 +80,77 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+enum OrganizationRole {
+  org_admin
+  org_user
+}
+
+model Organization {
+  id            String          @id @default(cuid())
+  name          String
+  createdAt     DateTime        @default(now())
+
+  users         User[]
+  members       OrganizationMember[]
+
+  invitations   OrganizationMemberInvitation[]
+
+  subscriptions  Subscription[]
+}
+
+model OrganizationMember {
+  id             String         @id @default(cuid())
+  user           User?          @relation(fields: [userId], references: [id])
+  userId         String?
+
+  role            OrganizationRole  @default(org_user)
+
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  organizationId String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+}
+
+enum OrganizationInvitationStatus {
+  pending
+  accepted
+  declined
+}
+
+model OrganizationMemberInvitation {
+  id              String      @id @default(cuid())
+  email           String
+  userId          String?
+
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  token           String      @unique
+  role            OrganizationRole  @default(org_user)
+
+  senderId        String?
+  sender          User?       @relation(fields: [senderId], references: [id])
+
+  status          OrganizationInvitationStatus      @default(pending)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+enum ProductType {
+  individual
+  organization
+}
+
 model Product {
   id String @id @default(cuid())
 
   productId String @unique
 
+  uniqueIdentifier  String  @unique
+
   name String
+
+  type  ProductType   @default(individual)
 
   active Boolean @default(false)
 
@@ -85,6 +167,7 @@ model Product {
   subscriptions Subscription[]
 
   @@index([productId])
+  @@index([uniqueIdentifier])
 }
 
 model ProductPrice {
@@ -126,7 +209,11 @@ model Subscription {
 
   user User? @relation(fields: [userId], references: [id])
 
-  userId String
+  userId String?
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  organizationId String?
 
   product Product @relation(fields: [productId], references: [productId])
 
@@ -149,6 +236,8 @@ model Subscription {
   updateAt DateTime @default(now())
 
   @@index([subscriptionId])
+  @@unique([subscriptionId, userId])
+  @@unique([subscriptionId, userId, organizationId])
 }
 
 enum SubscriptionStatus {

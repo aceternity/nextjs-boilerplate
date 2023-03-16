@@ -1,12 +1,13 @@
 import React from 'react'
-import { NextPage } from 'next';
 
 import { MainLayout, Table } from '@components/index';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useProducts } from '@hooks/query/plans';
 import { ProductData } from '@pages/api/products';
+import { NextPageWithProps } from '@pages/_app';
+import { Role } from '@prisma/client';
 
-const Users: NextPage = () => {
+const Users: NextPageWithProps = () => {
   const { data } = useProducts();
   
   const columnHelper = createColumnHelper<ProductData>();
@@ -34,4 +35,6 @@ const Users: NextPage = () => {
   )
 }
 
+Users.requireAuth = true;
+Users.roles = [Role.superadmin];
 export default Users;

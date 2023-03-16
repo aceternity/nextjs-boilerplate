@@ -2,7 +2,7 @@ import React, { HTMLProps } from 'react';
 import classNames from 'classnames';
 
 interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, 'size'> {
-  variant?: 'primary' | 'secondary' | 'warning';
+  variant?: 'primary' | 'secondary' | 'warning' | 'danger';
   children: React.ReactNode;
   onClick?: () => void;
   size?: 'sm' | 'md' | 'lg';
@@ -21,6 +21,8 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
         return 'bg-gray-300 hover:bg-gray-400 text-gray-800';
       case 'warning':
         return 'bg-yellow-500 hover:bg-yellow-600 text-white';
+      case 'danger':
+        return 'bg-red-500 hover:bg-red-600 text-white';
       default:
         return 'bg-blue-500 hover:bg-blue-600 text-white';
     }

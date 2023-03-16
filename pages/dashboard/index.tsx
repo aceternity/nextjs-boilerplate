@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { NextPage } from 'next';
 import { MainLayout } from '@components/index';
+import { NextPageWithProps } from '@pages/_app';
 
-const Dashboard: NextPage = () => {
+const Dashboard: NextPageWithProps = () => {
   return (
     <MainLayout>
       
@@ -11,4 +11,5 @@ const Dashboard: NextPage = () => {
   )
 }
 
+Dashboard.requireAuth = true;
 export default Dashboard;

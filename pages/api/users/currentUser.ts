@@ -10,7 +10,7 @@ export type UserData = {
 }
 
 const handler = nextConnect();
-handler.use(AuthMiddleWare([Role.customer]));
+handler.use(AuthMiddleWare([Role.customer, Role.superadmin]));
 
 handler.get(async (
   req: NextApiRequestWithSession,

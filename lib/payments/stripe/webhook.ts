@@ -46,6 +46,8 @@ export default class StripeWebhook {
             description: product.description,
             productId: product.id,
             active: product.active,
+            defaultPrice: undefined,
+            uniqueIdentifier: product.metadata.uniqueIdentifier || '',
           },
         });
       }
@@ -61,6 +63,7 @@ export default class StripeWebhook {
             productId: product.id,
             active: product.active,
             updateAt: new Date(product.updated),
+            uniqueIdentifier: product.metadata.uniqueIdentifier || '',
             defaultPrice: {
               connect: {
                 priceId: product.default_price?.toString()

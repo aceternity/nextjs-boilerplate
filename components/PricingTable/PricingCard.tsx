@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plan } from '@pages/api/plans';
+import { Plan, Price } from '@pages/api/plans';
 
 interface PricingCardProps {
   data: Plan;
@@ -18,14 +18,27 @@ const PricingCard = (props: PricingCardProps) => {
         priceData,
     ).replace(/\D00(?=\D*$)/, '')
   }
-  const price = data.prices.find((price) => price.currency === currency && price.interval === interval);
+
+  const renderType = (price: Price) => {
+    switch(price.type) {
+      case 'recurring':
+        return price.interval;
+      case 'one_time':
+        return 'Lifetime';
+    }
+  }
+  let price = data.prices.find((price) => price.currency === currency && price.interval === interval);
+
+  if (!price) {
+    price = data.prices[0];
+  }
   return (
     <div className="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
       <h3 className="mb-4 text-2xl font-semibold">{data?.name}</h3>
       <p className="font-light text-gray-500 sm:text-lg dark:text-gray-400">{data.description}</p>
       <div className="flex justify-center items-baseline my-8">
           <span className="mr-2 text-5xl font-extrabold">{getPrice(price && price.unitAmount || 0)}</span>
-          <span className="text-gray-500 dark:text-gray-400">/{price?.interval}</span>
+          <span className="text-gray-500 dark:text-gray-400">/{renderType(price)}</span>
       </div>
 
       <ul role="list" className="mb-8 space-y-4 text-left">

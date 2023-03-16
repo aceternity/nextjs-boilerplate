@@ -71,7 +71,7 @@ export const nextAuthOptions: NextAuthOptions = {
             }
           });
 
-          if (!user || user.password) {
+          if (!user) {
             return reject(new Error('Invalid credentials'))
           }
 
