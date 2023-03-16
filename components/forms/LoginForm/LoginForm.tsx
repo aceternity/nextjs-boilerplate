@@ -10,6 +10,8 @@ import Link from 'next/link';
 
 import { FcGoogle } from 'react-icons/fc';
 import { VscGithub } from 'react-icons/vsc';
+import { BsFacebook, BsTwitter } from 'react-icons/bs';
+
 import classNames from 'classnames';
 
 export const AuthDivider = () => {
@@ -26,10 +28,11 @@ interface SocialAuthProps {
 }
 export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
 
-  const buttonCommonClasses = "w-full rounded-md justify-center font-medium py-2 border px-4 flex items-center gap-2";
+  const buttonCommonClasses = "w-full text-sm rounded-md justify-center font-medium py-2 border px-4 flex items-center gap-2 text-secondary-600 hover:underline dark:text-secondary-500";
 
+  const commonString = 'Login with ';
   return (
-    <div className='flex px-2 flex-col max-w-md md:flex-row mx-auto gap-2 py-2 justify-center items-center text-center'>
+    <div className='grid grid-cols-1 md:grid-cols-2 px-2 flex-col max-w-md md:flex-row mx-auto gap-2 py-2 justify-center items-center text-center'>
     {providers && Object.keys(providers).map((providerKey) => {
         if (providers[providerKey].type === 'oauth') {
           switch(providers[providerKey].id) {
@@ -40,25 +43,47 @@ export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
                 onClick={() => signIn(providers[providerKey].id)}
                 className={classNames(
                   buttonCommonClasses,
-                  "text-primary-600 hover:underline dark:text-primary-500"
                   )}>
                   <FcGoogle />
-                  Sign in with {providers[providerKey].id}
+                  {commonString}{providers[providerKey].id}
               </button>
               );
-              case 'github':
-                return (
-                <button 
-                  disabled={loading} 
-                  onClick={() => signIn(providers[providerKey].id)}
-                  className={classNames(
-                    buttonCommonClasses, 
-                    "text-secondary-600 hover:underline dark:text-secondary-500"
-                  )}>
-                    <VscGithub />
-                    Sign in with {providers[providerKey].id}
-                </button>
-                );
+            case 'github':
+              return (
+              <button 
+                disabled={loading} 
+                onClick={() => signIn(providers[providerKey].id)}
+                className={classNames(
+                  buttonCommonClasses, 
+                )}>
+                  <VscGithub />
+                  {commonString}{providers[providerKey].id}
+              </button>
+              );
+            case 'twitter':
+              return (
+              <button 
+                disabled={loading} 
+                onClick={() => signIn(providers[providerKey].id)}
+                className={classNames(
+                  buttonCommonClasses, 
+                )}>
+                  <BsTwitter />
+                  {commonString}{providers[providerKey].id}
+              </button>
+              );
+            case 'facebook':
+              return (
+              <button 
+                disabled={loading} 
+                onClick={() => signIn(providers[providerKey].id)}
+                className={classNames(
+                  buttonCommonClasses, 
+                )}>
+                  <BsFacebook />
+                  {commonString}{providers[providerKey].id}
+              </button>
+              );
           }
         }
         return null;

@@ -3,6 +3,10 @@ import NextAuth, { Awaitable, NextAuthOptions, User as NextAuthUser } from "next
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
+import TwitterProvider from 'next-auth/providers/twitter';
+// import FacebookProvider from 'next-auth/providers/facebook';
+
+
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import prisma from "@lib/prisma";
@@ -53,6 +57,14 @@ export const nextAuthOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
     }),
+    // TwitterProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID as string,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+    // }),
+    // FacebookProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID as string,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+    // }),
     CredentialsProvider({
       type: 'credentials',
       credentials: {
