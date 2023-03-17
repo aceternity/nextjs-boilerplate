@@ -31,14 +31,19 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = (props: Subscription
 
   if (!plans) return <>{children}</>;
 
+  if (!data.subscription)  {
+    router.replace("/pricing");
+    return <></>;
+  }
 
-  if (plans.some((plan) => plan.includes(data.product.uniqueIdentifier))) {
+  const { product } = data.subscription;
+  if (plans.some((plan) => plan.includes(product.uniqueIdentifier))) {
     return <>{children}</>;
   } else {
     if (session?.user.role === Role.superadmin) {
       return <>{children}</>;
     }
-    router.replace("/403");
+    router.replace("/pricing");
     return <></>;
   }
 };

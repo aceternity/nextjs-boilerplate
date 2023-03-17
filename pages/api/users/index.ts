@@ -2,6 +2,8 @@ import type { NextApiResponse } from 'next'
 import prisma from '@lib/prisma'
 import { Prisma, Role, User } from '@prisma/client';
 import { createPaginator, PaginatedNextApiRequest, PaginatedResult } from '@lib/pagination';
+import nextConnect from 'next-connect';
+import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
 
 export interface UserData {
   id: number;
@@ -13,13 +15,15 @@ export interface UserData {
 }
 
 export type UsersData = PaginatedResult<UserData>;
+const handler = nextConnect();
+handler.use(AuthMiddleWare([Role.superadmin]));
 
 const paginate = createPaginator({ perPage: 20 });
 
-export default async function handler(
-  req: PaginatedNextApiRequest,
+handler.get(async (
+  req: PaginatedNextApiRequest & NextApiRequestWithSession,
   res: NextApiResponse<UsersData>
-) {
+) => {
   const { query } = req;
   const { page } = query;
   const result = await paginate<UserData, Prisma.UserFindManyArgs>(
@@ -37,4 +41,6 @@ export default async function handler(
     { page: page }
   );
   res.status(200).json(result);
-}
+});
+
+export default handler;
