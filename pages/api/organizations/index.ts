@@ -1,6 +1,6 @@
 import type { NextApiResponse } from 'next'
 import prisma from '@lib/prisma'
-import { Prisma, Role } from '@prisma/client';
+import { Prisma, Role, Subscription } from '@prisma/client';
 import { createPaginator, PaginatedNextApiRequest, PaginatedResult } from '@lib/pagination';
 import nextConnect from 'next-connect';
 import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
@@ -8,8 +8,11 @@ import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
 export interface OrganizationData {
   id: number;
   name: string | null;
-  membersCount?: number;
-  invitationsCount?: number;
+  subscription: Subscription;
+  _count: {
+    invitations: number;
+    members: number;
+  }
 }
 
 export type OrganizationsData = PaginatedResult<OrganizationData>;
@@ -31,19 +34,7 @@ handler.get(async (
       select: {
         id: true,
         name: true,
-        members: {
-          select: {
-            id: true,
-          },
-        },
-        invitations: {
-          where: {
-            status: 'pending'
-          },
-          select: {
-            id: true,
-          },
-        },
+        subscription: true,
         _count: {
           select: {
             members: true,

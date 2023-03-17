@@ -18,8 +18,17 @@ const Organizations: NextPageWithProps = () => {
     columnHelper.accessor('name', {
       cell: info => info.getValue(),
     }),
-    columnHelper.accessor('membersCount', {
+    columnHelper.accessor('_count.invitations', {
+      header: info => 'Invitations',
       cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('_count.members', {
+      header: info => 'Members',
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('subscription', {
+      header: info => 'Subscription',
+      cell: info => info.getValue() ? info.getValue().priceId: 'No Plan',
     }),
   ];
 
