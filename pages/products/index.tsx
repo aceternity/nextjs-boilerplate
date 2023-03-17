@@ -18,6 +18,9 @@ const Users: NextPageWithProps = () => {
     columnHelper.accessor('name', {
       cell: info => info.getValue(),
     }),
+    columnHelper.accessor('uniqueIdentifier', {
+      cell: info => info.getValue(),
+    }),
     columnHelper.accessor('active', {
       cell: info => info.getValue() ? 'ACTIVE': 'INACTIVE',
     }),

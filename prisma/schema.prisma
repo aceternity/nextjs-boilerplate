@@ -52,7 +52,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role           @default(customer)
-  subscriptions Subscription[]
+  subscription Subscription?
 
   organizations Organization[]
   invitations   OrganizationMemberInvitation[]
@@ -60,6 +60,8 @@ model User {
   memberInOrganizations OrganizationMember[]
 
   resetToken    PasswordResetToken[]
+
+  stripeCustomerId String?
 }
 
 model PasswordResetToken {
@@ -146,7 +148,7 @@ model Product {
 
   productId String @unique
 
-  uniqueIdentifier  String  @unique
+  uniqueIdentifier  String
 
   name String
 
@@ -209,7 +211,7 @@ model Subscription {
 
   user User? @relation(fields: [userId], references: [id])
 
-  userId String?
+  userId String? @unique()
 
   organization Organization? @relation(fields: [organizationId], references: [id])
 

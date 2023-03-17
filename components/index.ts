@@ -1,4 +1,5 @@
 /* PLOP_INJECT_IMPORT */
+import SubscriptionGuard from './SubscriptionGuard';
 import { Dialog } from './Dialog';
 import AuthGuard from './AuthGuard';
 import Flex from './Flex';
@@ -11,6 +12,7 @@ import AuthLayout from './layouts/AuthLayout';
 
 export {
   /* PLOP_INJECT_EXPORT */
+	SubscriptionGuard,
 	Dialog,
 	AuthGuard,
 	Flex,

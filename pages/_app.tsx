@@ -11,18 +11,22 @@ import { Role } from '@prisma/client';
 import AuthGuard from '@components/AuthGuard';
 import { Toaster } from 'react-hot-toast';
 
+import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
+import SubscriptionGuard from '@components/SubscriptionGuard';
+
 export type NextPageWithProps<P = {}, IP = P> = NextPage<P, IP> & {
   requireAuth?: boolean,
   roles?: Role[] | undefined;
+
+  requireSubscription?: boolean;
+  plans?: SUBSCRIPTION_PLAN[]
 };
 
 export type AppPropsWithExtra<P> = AppProps<P> & { 
   Component: NextPageWithProps<P>; 
 };
 
-
 export const queryClient = new QueryClient();
-
 
 const App = ({ Component, pageProps }: AppPropsWithExtra<{ session: Session; }>) => {
   const { session } = pageProps;
@@ -31,7 +35,13 @@ const App = ({ Component, pageProps }: AppPropsWithExtra<{ session: Session; }>)
       <SessionProvider session={session}>
         {Component.requireAuth ? (
             <AuthGuard roles={Component.roles}>
-              <Component {...pageProps} />
+              {Component.requireSubscription ? (
+                <SubscriptionGuard plans={Component.plans}>
+                  <Component {...pageProps} />
+                </SubscriptionGuard>
+                ): (
+                <Component {...pageProps} />
+              )}
             </AuthGuard>
           ) : (
             <Component {...pageProps} />

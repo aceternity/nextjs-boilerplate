@@ -4,6 +4,7 @@ import { StripeService } from '@lib/payments/stripe/service';
 import nextConnect from 'next-connect';
 import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
 import { Role } from '@prisma/client';
+import prisma from '@lib/prisma';
 
 interface CheckoutApiRequest extends NextApiRequestWithSession {
   body: {
@@ -25,16 +26,21 @@ handler.post(async (
   const user = req.session?.user;
   const { priceId } = req.body;
 
+  const currentUser = await prisma.user.findUnique({
+    where: { id: user?.id as string }
+  })
+
   const params: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
     client_reference_id: user?.id.toString() || undefined,
-    customer_email: user?.email || undefined,
+    customer_email: currentUser?.stripeCustomerId ? undefined : user?.email as string,
     line_items: [
       {
         price: priceId,
         quantity: 1,
       }
     ],
+    customer: currentUser?.stripeCustomerId || undefined,
     subscription_data: {
       metadata: {
         userId: user?.id || null,

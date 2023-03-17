@@ -25,7 +25,7 @@ interface MainLayoutProps {
 const MainLayout = (props: MainLayoutProps) => {
   const { children, tab } = props;
   return (
-    <div className="flex flex-col flex-no-wrap h-screen">
+    <div className="flex flex-col flex-no-wrap">
       <Tabs items={accountTabs} defaultTab={tab} />
       {children}
     </div>

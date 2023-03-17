@@ -7,6 +7,7 @@ export interface ProductData {
   id: string;
   name: string;
   active: boolean;
+  uniqueIdentifier: string;
 }
 
 export type ProductsData = PaginatedResult<ProductData>;
@@ -26,6 +27,7 @@ export default async function handler(
         id: true,
         name: true,
         active: true,
+        uniqueIdentifier: true
       }
     },
     { page: page }

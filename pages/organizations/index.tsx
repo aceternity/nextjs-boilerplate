@@ -6,6 +6,8 @@ import { useUsers } from '@hooks/query/users';
 import { UserData } from '@pages/api/users';
 import { NextPageWithProps } from '@pages/_app';
 
+import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
+
 const Organizations: NextPageWithProps = () => {
   const { data } = useUsers();
   
@@ -39,4 +41,7 @@ const Organizations: NextPageWithProps = () => {
 }
 
 Organizations.requireAuth = true;
+Organizations.requireSubscription = true;
+Organizations.plans = [SUBSCRIPTION_PLAN.team];
+
 export default Organizations;

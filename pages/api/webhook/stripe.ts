@@ -1,4 +1,5 @@
 import StripeWebhook from '@lib/payments/stripe/webhook';
+import prisma from '@lib/prisma';
 import { buffer } from 'micro';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -17,8 +18,10 @@ export default async function handleStripeWebhook(
       sig,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
-
-    await stripeInstace.handleEvent(event);
+    
+    await prisma.$transaction(async (prismaTrasaction) => {
+      await stripeInstace.handleEvent(prismaTrasaction, event);
+    });
     res.status(200).send('OK');
   } catch(e: any) {
     res.status(400).send(`Webhook Error: ${e?.message || e}`);

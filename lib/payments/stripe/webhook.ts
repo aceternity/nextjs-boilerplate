@@ -1,4 +1,4 @@
-import prisma from "@lib/prisma";
+import { Prisma, PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 import { StripeService } from "./service";
 
@@ -35,7 +35,7 @@ export default class StripeWebhook {
     }
   }
 
-  public async handleEvent(event: Stripe.Event): Promise<void> {
+  public async handleEvent(prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">, event: Stripe.Event): Promise<void> {
     
     switch (event.type) {
       case 'product.created': {
@@ -53,40 +53,63 @@ export default class StripeWebhook {
       }
       case 'product.updated': {
         const product = event.data.object as Stripe.Product;
-        await prisma.product.update({
-          where: {
-            productId: product.id,
-          },
-          data: {
-            name: product.name,
-            description: product.description,
-            productId: product.id,
-            active: product.active,
-            updateAt: new Date(product.updated),
-            uniqueIdentifier: product.metadata.uniqueIdentifier || '',
-            defaultPrice: {
-              connect: {
-                priceId: product.default_price?.toString()
+        const defaultPriceId = product.default_price?.toString();
+        const defaultPriceExists = await prisma.productPrice.findUnique({
+          where: { priceId: defaultPriceId },
+        });
+      
+        const data = {
+          name: product.name,
+          description: product.description,
+          productId: product.id,
+          active: product.active,
+          updatedAt: new Date(product.updated),
+          uniqueIdentifier: product.metadata.uniqueIdentifier || '',
+          defaultPrice: defaultPriceExists
+            ? {
+                connect: { priceId: defaultPriceId },
               }
-            }
-          },
+            : undefined,
+        };
+      
+        await prisma.product.update({
+          where: { productId: product.id },
+          data,
         });
         break;
       }
       case 'product.deleted': {
         const product = event.data.object as Stripe.Product;
-        await prisma.product.update({
+        await prisma.product.delete({
           where: {
             productId: product.id,
-          },
-          data: {
-            active: false
           }
         });
         break;
       }
       case 'price.created': {
         const price = event.data.object as Stripe.Price;
+        const productExists = await prisma.product.findUnique({
+          where: { productId: price.product as string },
+        });
+      
+        if (!productExists) {
+          // fetch the product from Stripe
+          const stripeProduct = await this.stripe.products.retrieve(price.product as string);
+          // create the product in the database
+          await prisma.product.create({
+            data: {
+              name: stripeProduct.name,
+              description: stripeProduct.description,
+              productId: stripeProduct.id,
+              active: stripeProduct.active,
+              defaultPrice: undefined,
+              uniqueIdentifier: stripeProduct.metadata.uniqueIdentifier || '',
+            },
+          });
+          // handle the error appropriately, e.g. log it or throw an error
+          console.error(`Product not found for price ${price.id}`);
+        }
         await prisma.productPrice.create({
           data: {
             priceId: price.id as string,
@@ -108,20 +131,44 @@ export default class StripeWebhook {
       }
       case 'price.updated': {
         const price = event.data.object as Stripe.Price;
-        await prisma.productPrice.update({
-          where: {
-            priceId: price.id,
+        const productExists = await prisma.product.findUnique({
+          where: { productId: price.product as string },
+        });
+      
+        if (!productExists) {
+          // fetch the product from Stripe
+          const stripeProduct = await this.stripe.products.retrieve(price.product as string);
+          // create the product in the database
+          await prisma.product.create({
+            data: {
+              name: stripeProduct.name,
+              description: stripeProduct.description,
+              productId: stripeProduct.id,
+              active: stripeProduct.active,
+              defaultPrice: undefined,
+              uniqueIdentifier: stripeProduct.metadata.uniqueIdentifier || '',
+            },
+          });
+          // handle the error appropriately, e.g. log it or throw an error
+          console.error(`Product not found for price ${price.id}`);
+        }
+      
+        const data = {
+          priceId: price.id as string,
+          product: {
+            connect: { productId: price.product as string },
           },
-          data: {
-            id: price.id,
-            priceId: price.product as string,
-            active: price.active,
-            interval: price.recurring?.interval,
-            interval_count: price.recurring?.interval_count,
-            currency: price.currency,
-            type: price.type,
-            unitAmount: price.unit_amount || 0,
-          }
+          interval: price.recurring?.interval,
+          interval_count: price.recurring?.interval_count,
+          description: '',
+          active: price.active,
+          currency: price.currency,
+          type: price.type,
+          unitAmount: price.unit_amount || 0,
+        };
+      
+        await prisma.productPrice.create({
+          data,
         });
         break;
       }
@@ -137,90 +184,65 @@ export default class StripeWebhook {
         });
         break;
       }
+      case 'customer.subscription.created':
+      case 'customer.subscription.pending_update_applied': 
+      case 'customer.subscription.paused':
+      case 'customer.subscription.resumed':
+      case 'customer.subscription.updated': 
+      case 'customer.subscription.pending_update_expired': 
       case 'customer.subscription.created': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscriptionEvent = event.data.object as Stripe.Subscription;
+        const subscription = await this.stripe.subscriptions.retrieve(subscriptionEvent.id as string);
         const product = subscription.items.data[0];
         const productPriceId = product.price.id;
         const { product: productId } = product.price;
         const customerId = subscription.customer.toString();
         const { metadata } = subscription;
 
-        await prisma.subscription.create({
-          data: {
-            paymentCustomerId: customerId,
-            subscriptionId: subscription.id,
-            user: { connect: { id: metadata.userId } },
-            product: { connect: { productId: productId as string } },
-            price: { connect: { priceId: productPriceId } },
-            status: subscription.status,
-            startDate: new Date(subscription.current_period_start * 1000),
-            endDate: new Date(subscription.current_period_end * 1000),
+        const user = await prisma.user.findUnique({
+          where: {
+            id: metadata.userId
           },
+          select: {
+            stripeCustomerId: true,
+          }
         });
-  
-        break;
-      }
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
-  
-        await prisma.subscription.update({
-          where: { subscriptionId: subscription.id },
-          data: { status: 'canceled', endDate: new Date() },
-        });
-  
-        break;
-      }
-      case 'customer.subscription.paused': {
-        const subscription = event.data.object as Stripe.Subscription;
-  
-        await prisma.subscription.update({
-          where: { subscriptionId: subscription.id },
-          data: { status: 'paused' },
-        });
-  
-        break;
-      }
-      case 'customer.subscription.pending_update_applied': {
-        const subscription = event.data.object as Stripe.Subscription;
-  
-        await prisma.subscription.update({
-          where: { subscriptionId: subscription.id },
-          data: { status: subscription.status },
-        });
-  
-        break;
-      }
-      case 'customer.subscription.pending_update_expired': {
-        const subscription = event.data.object as Stripe.Subscription;
-  
-        await prisma.subscription.update({
-          where: { subscriptionId: subscription.id },
-          data: { status: subscription.status },
-        });
-  
-        break;
-      }
-      case 'customer.subscription.resumed': {
-        const subscription = event.data.object as Stripe.Subscription;
-  
-        await prisma.subscription.update({
-          where: { subscriptionId: subscription.id },
-          data: { status: 'active' },
-        });
-  
-        break;
-      }
-      case 'customer.subscription.trial_will_end': {
-        // Handle trial will end event here
-        break;
-      }
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
-  
-        await prisma.subscription.update({
-          where: { subscriptionId: subscription.id },
-          data: { status: subscription.status },
-        });
+
+        if (user) {
+          await prisma.subscription.upsert({
+            where: {
+              subscriptionId: subscription.id,
+            },
+            create: {
+              paymentCustomerId: customerId,
+              subscriptionId: subscription.id,
+              user: { connect: { id: metadata.userId } },
+              product: { connect: { productId: productId as string } },
+              price: { connect: { priceId: productPriceId } },
+              status: subscription.status,
+              startDate: new Date(subscription.current_period_start * 1000),
+              endDate: new Date(subscription.current_period_end * 1000),
+            },
+            update: {
+              product: { connect: { productId: productId as string } },
+              price: { connect: { priceId: productPriceId } },
+              status: subscription.status,
+              startDate: new Date(subscription.current_period_start * 1000),
+              endDate: new Date(subscription.current_period_end * 1000),
+            }
+          });
+
+          if (!user.stripeCustomerId) {
+            await prisma.user.update({ 
+              where: {
+                id: metadata.userId
+              },
+              data: {
+                stripeCustomerId: customerId
+              }
+            })
+          }
+        }
   
         break;
       }

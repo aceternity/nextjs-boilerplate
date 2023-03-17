@@ -1,6 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@lib/prisma'
 
+function sortPlansByUnitAmount(plans: Plan[]): Plan[] {
+  return plans.sort((a, b) => {
+    const priceA = a.prices.find((price) => price.active);
+    const priceB = b.prices.find((price) => price.active);
+    if (!priceA || !priceB) {
+      return 0;
+    }
+    return priceA.unitAmount - priceB.unitAmount;
+  });
+}
 export interface Price {
   active: boolean;
   priceId: string;
@@ -56,7 +66,7 @@ export default async function handler(
           unitAmount: true,
         }
       }
-    }
+    },
   })
-  res.status(200).json({ data: { plans: plans } })
+  res.status(200).json({ data: { plans: sortPlansByUnitAmount(plans) } })
 }
