@@ -12,8 +12,13 @@ export const accountTabs: TabItem[] = [
   },
   {
     key: 'password',
-    title: 'Password',
+    title: 'Change Password',
     route: '/account/password'
+  },
+  {
+    key: 'billing',
+    title: 'Billing',
+    route: '/account/billing'
   }
 ]
 

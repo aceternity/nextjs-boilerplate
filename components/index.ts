@@ -1,4 +1,6 @@
 /* PLOP_INJECT_IMPORT */
+import CurrentPlanCard from './CurrentPlanCard';
+import PricingComponent from './PricingComponent';
 import SubscriptionGuard from './SubscriptionGuard';
 import { Dialog } from './Dialog';
 import AuthGuard from './AuthGuard';
@@ -12,6 +14,8 @@ import AuthLayout from './layouts/AuthLayout';
 
 export {
   /* PLOP_INJECT_EXPORT */
+	CurrentPlanCard,
+	PricingComponent,
 	SubscriptionGuard,
 	Dialog,
 	AuthGuard,

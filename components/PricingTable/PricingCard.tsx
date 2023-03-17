@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plan, Price } from '@pages/api/plans';
+import { getPrice } from '@utils/pricing';
 
 interface PricingCardProps {
   data: Plan;
@@ -11,13 +12,6 @@ interface PricingCardProps {
 
 const PricingCard = (props: PricingCardProps) => {
   const { data, currency, interval, onClickSubscribe } = props;
-
-  const getPrice = (price: number) => {
-    const priceData = price / 100;
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency: currency.toUpperCase() }).format(
-        priceData,
-    ).replace(/\D00(?=\D*$)/, '')
-  }
 
   const renderType = (price: Price) => {
     switch(price.type) {
@@ -37,7 +31,7 @@ const PricingCard = (props: PricingCardProps) => {
       <h3 className="mb-4 text-2xl font-semibold">{data?.name}</h3>
       <p className="font-light text-gray-500 sm:text-lg dark:text-gray-400">{data.description}</p>
       <div className="flex justify-center items-baseline my-8">
-          <span className="mr-2 text-5xl font-extrabold">{getPrice(price && price.unitAmount || 0)}</span>
+          <span className="mr-2 text-5xl font-extrabold">{getPrice(price && price.unitAmount || 0, currency)}</span>
           <span className="text-gray-500 dark:text-gray-400">/{renderType(price)}</span>
       </div>
 

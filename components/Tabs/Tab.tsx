@@ -40,12 +40,12 @@ const Tab = (props: TabProps) => {
       }}>
         <button 
           className={classNames(
-            "inline-block p-4 border-b-2 rounded-t-l hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300",
+            "inline-block p-2 md:p-4 border-b-2 rounded-t-l hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300",
             isActive ? "border-black": "border-transparent"
           )}
           type="button" 
           role="tab" 
-          aria-controls="contacts" 
+          aria-controls="tabs" 
           aria-selected="false"
           >
             {title}
