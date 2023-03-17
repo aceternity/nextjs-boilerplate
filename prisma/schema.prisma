@@ -16,6 +16,15 @@ enum Role {
   customer
 }
 
+enum OrganizationStatus {
+  active
+  inactive
+}
+
+enum UserStatus {
+  active
+  inactive
+}
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -62,6 +71,8 @@ model User {
   resetToken    PasswordResetToken[]
 
   stripeCustomerId String?
+
+  status      UserStatus  @default(active)
 }
 
 model PasswordResetToken {
@@ -92,12 +103,14 @@ model Organization {
   name          String
   createdAt     DateTime        @default(now())
 
+  status        OrganizationStatus @default(active)
+
   users         User[]
   members       OrganizationMember[]
 
   invitations   OrganizationMemberInvitation[]
 
-  subscriptions  Subscription[]
+  subscription  Subscription?
 }
 
 model OrganizationMember {
@@ -211,11 +224,11 @@ model Subscription {
 
   user User? @relation(fields: [userId], references: [id])
 
-  userId String? @unique()
+  userId String? @unique
 
   organization Organization? @relation(fields: [organizationId], references: [id])
 
-  organizationId String?
+  organizationId String?  @unique
 
   product Product @relation(fields: [productId], references: [productId])
 

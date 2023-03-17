@@ -12,11 +12,14 @@ interface FlexProps {
 }
 
 const Flex: React.FC<FlexProps> = (props: FlexProps) => {
-  const { children, direction = 'row', justifyContent = 'start', alignItems = 'start', wrap = 'wrap', gap = '0', classes } = props;
+  const { children, direction = 'row', justifyContent, alignItems, wrap, gap = '0', classes } = props;
   return (
     <div 
       className={classNames(
-      `w-full flex flex-${direction} justify-${justifyContent} items-${alignItems} flex-${wrap}`,
+      `w-full flex flex-${direction}`,
+      justifyContent? `justify-${justifyContent}`: '',
+      alignItems ? `items-${alignItems}`: '',
+      wrap ? `flex-${wrap}`: '',
       direction === 'col'? `space-y-${gap}`: `gap-${gap}`,
       classes
       )}

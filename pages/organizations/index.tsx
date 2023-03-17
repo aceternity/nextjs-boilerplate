@@ -1,41 +1,43 @@
 import React from 'react'
 
-import { MainLayout, Table } from '@components/index';
+import { DialogComponent, Flex, MainLayout, Table } from '@components/index';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useUsers } from '@hooks/query/users';
-import { UserData } from '@pages/api/users';
 import { NextPageWithProps } from '@pages/_app';
 
 import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
+import { OrganizationForm } from '@components/forms';
+import { useCreateOrganization, useOrganzations } from '@hooks/query/organizations';
+import { OrganizationData } from '@pages/api/organizations';
 
 const Organizations: NextPageWithProps = () => {
-  const { data } = useUsers();
+  const { data } = useOrganzations();
+  const { createOrganization, isLoading: createLoading } = useCreateOrganization();
   
-  const columnHelper = createColumnHelper<UserData>();
+  const columnHelper = createColumnHelper<OrganizationData>();
   const columns = [
-    columnHelper.accessor('email', {
-      cell: info => info.getValue(),
-    }),
     columnHelper.accessor('name', {
       cell: info => info.getValue(),
     }),
-    columnHelper.accessor('role', {
-      cell: info => info.getValue().toString(),
-    }),
-    columnHelper.accessor('emailVerified', {
-      header: info => 'Email Verified',
+    columnHelper.accessor('membersCount', {
       cell: info => info.getValue(),
     }),
   ];
 
   return (
     <MainLayout>
-      <Table
-        title="Organizations"
-        caption=""
-        columns={columns}
-        data={data?.data}
-      />
+      <Flex gap='2' direction="col">
+        <div className='flex justify-end'>
+          <DialogComponent buttonText="Add new Organization">
+              <OrganizationForm onSubmit={createOrganization} loading={createLoading} />
+          </DialogComponent>
+        </div>
+        <Table
+          title="Organizations"
+          caption=""
+          columns={columns}
+          data={data?.data}
+        />
+      </Flex>
     </MainLayout>
   )
 }

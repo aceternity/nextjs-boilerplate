@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
+import useYupValidationResolver from '@hooks/useYupValidationResolver';
+import * as yup from 'yup';
 
 export type {{pascalCase name}}Values = {
 
@@ -10,17 +12,28 @@ interface {{pascalCase name}}Props {
   loading?: boolean;
 }
 
+const validationSchema: yup.ObjectSchema<OrganizationFormValues> = yup.object({
+
+});
+
 const {{pascalCase name}}: React.FC<{{pascalCase name}}Props> = (props: {{pascalCase name}}Props) => {
   const { onSubmit, loading } = props;
+  const resolver = useYupValidationResolver(validationSchema);
 
   const methods = useForm<{{pascalCase name}}Values>({
     defaultValues: {},
+    resolver
   });
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
-        {{pascalCase name}}
+        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <div>
+            {{pascalCase name}}
+          </div>
+        </div>
+         <Button classes="w-full" type="submit" disabled={loading}>Save</Button>
       </form>
     </FormProvider>
   );
