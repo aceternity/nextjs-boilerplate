@@ -14,12 +14,13 @@ import { OrganizationForm } from '@components/forms';
 import { OrganizationFormValues } from '@components/forms/OrganizationForm/OrganizationForm';
 
 interface PricingComponentProps {
-  isOrganization?: boolean;
+  organizationId?: string | undefined;
+  isCreateOrganization?: boolean;
 }
 
 const PricingComponent: React.FC<PricingComponentProps> = (props: PricingComponentProps) => {
-  const { isOrganization } = props;
-  const { isLoading, data } = usePlans({ isOrganization });
+  const { organizationId = undefined, isCreateOrganization = false } = props;
+  const { isLoading, data } = usePlans({ isOrganization: (organizationId || isCreateOrganization) ? true: false });
   const { data: authSession } = useSession();
   const router = useRouter();
 
@@ -34,7 +35,7 @@ const PricingComponent: React.FC<PricingComponentProps> = (props: PricingCompone
       return;
     }
     
-    if (uniqueIdentifier  === SUBSCRIPTION_PLAN.TEAMS) {
+    if (uniqueIdentifier  === SUBSCRIPTION_PLAN.TEAMS && isCreateOrganization) {
       setSelectedPriceId(priceId);
       setOrganizationFormDialogOpen(true);
       return;
@@ -48,9 +49,11 @@ const PricingComponent: React.FC<PricingComponentProps> = (props: PricingCompone
     const requestObject: CheckoutBody  = {
       priceId,
       organization: organizationValues,
+      organizationId: organizationId,
     };
 
-    const { data: { session } }: AxiosResponse<CheckoutData> = await AxoisClient.getInstance().post('api/checkout', requestObject);
+    const { data: { session } }: AxiosResponse<CheckoutData> = await AxoisClient.getInstance().post(
+      `api/checkout${organizationId ? `?organizationId=${organizationId}`: ''}`, requestObject);
 
     const stripe = await getStripe();
     const { error } = await stripe!.redirectToCheckout({

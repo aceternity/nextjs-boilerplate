@@ -10,7 +10,7 @@ class PrismaSingleton {
       this.prisma = new PrismaClient({ log: ['info', 'warn'] });
     } else {
       if (!global || !(global as any).prisma) {
-        (global as any).prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
+        (global as any).prisma = new PrismaClient({ log: ['error'] });
       }
       this.prisma = (global as any).prisma;
     }

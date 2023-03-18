@@ -176,23 +176,20 @@ export default class StripeWebhook {
               connect: { id: organizationId }
             }
           }
-          
+
           await prisma.subscription.upsert(subscrptionUpsert);
           
           if (organizationId) {
-            try {
-              await prisma.organizationMember.create({
-                data: {
-                  role: 'org_admin',
-                  organization: {
-                    connect: { id: organizationId }
-                  },
-                  user: {
-                    connect: { id: metadata.userId }
-                  }
+            const user = await prisma.organizationMember.findUnique({
+              where: {
+                userId_organizationId: {
+                  userId: metadata.userId,
+                  organizationId: organizationId,
                 }
-              });
-
+              }
+            });
+           
+            try {
               await prisma.organization.update({
                 where:  { id: organizationId },
                 data: { 
@@ -202,6 +199,19 @@ export default class StripeWebhook {
                   }
                 }
               });
+              if (!user) {
+              await prisma.organizationMember.create({
+                  data: {
+                    role: 'org_admin',
+                    organization: {
+                      connect: { id: organizationId }
+                    },
+                    user: {
+                      connect: { id: metadata.userId }
+                    }
+                  }
+                });
+              }
             } catch (e) {
               if (e instanceof Prisma.PrismaClientKnownRequestError) {
                 // The .code property can be accessed in a type-safe manner

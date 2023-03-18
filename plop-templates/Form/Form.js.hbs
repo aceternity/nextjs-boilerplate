@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
+
+import { Button } from '@components/elements';
 import useYupValidationResolver from '@hooks/useYupValidationResolver';
 import * as yup from 'yup';
 
@@ -12,7 +14,7 @@ interface {{pascalCase name}}Props {
   loading?: boolean;
 }
 
-const validationSchema: yup.ObjectSchema<OrganizationFormValues> = yup.object({
+const validationSchema: yup.ObjectSchema<{{pascalCase name}}Values> = yup.object({
 
 });
 

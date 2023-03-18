@@ -1,25 +1,29 @@
 import React from 'react'
 import { NextPage } from 'next';
 
-import { Flex, MainLayout, Table } from '@components/index';
+import { DialogComponent, Flex, MainLayout, Table } from '@components/index';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useUsers } from '@hooks/query/users';
-import { UserData } from '@pages/api/users';
 import OrganizationLayout from '@components/layouts/OrganizationLayout';
-import { useOrganizationInvitationsMembers, useOrganizationMembers } from '@hooks/query/organizations';
+import { 
+  useInviteMemberToOrganization,
+  useOrganizationInvitationsMembers, 
+  useOrganizationMembers,
+} from '@hooks/query/organizations';
 import { useRouter } from 'next/router';
 import { OrganizationMemberData } from '@pages/api/organizations/[id]/members';
 import { OrganizationInvitationMemberData } from '@pages/api/organizations/[id]/invitations';
 
+import { OrganizationMemberInviteForm } from '@components/forms';
+
 const Users: NextPage = () => {
   const router = useRouter();
-
   const { query } = router;
-
   const { organizationId } = query;
-  const { data } = useOrganizationMembers({ organizationId: organizationId as string  });
 
+  const { data } = useOrganizationMembers({ organizationId: organizationId as string  });
   const { data: inivitaionMembers } = useOrganizationInvitationsMembers({ organizationId: organizationId as string  });
+
+  const { invite, isLoading: inviteLoading }  = useInviteMemberToOrganization({ organizationId: organizationId as string });
   
   const memberColumnHelper = createColumnHelper<OrganizationMemberData>();
   const membersColumns = [
@@ -64,12 +68,19 @@ const Users: NextPage = () => {
           data={data?.data}
         />
 
-        <Table
-          title="Invitations"
-          caption=""
-          columns={invitationsColumns}
-          data={inivitaionMembers?.data}
-        />
+        <Flex gap='2' direction="col">
+          <div className='flex justify-end'>
+            <DialogComponent buttonText="Invite Member">
+                <OrganizationMemberInviteForm onSubmit={invite} loading={inviteLoading} />
+            </DialogComponent>
+            </div>
+            <Table
+              title="Invitations"
+              caption=""
+              columns={invitationsColumns}
+              data={inivitaionMembers?.data}
+            />
+          </Flex>
         </Flex>
       </OrganizationLayout>
     </MainLayout>

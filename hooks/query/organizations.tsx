@@ -9,6 +9,7 @@ import { queryClient } from "@pages/_app";
 import { OrganizationSubscription } from "@pages/api/organizations/[id]/subscription";
 import { OrganizationMembersData } from "@pages/api/organizations/[id]/members";
 import { OrganizationInvitationsMembersData } from "@pages/api/organizations/[id]/invitations";
+import { OrganizationMemberInviteFormValues } from "@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm";
 
 const useOrganzations = () => {
   const { data, isLoading, error } = useQuery(
@@ -60,13 +61,13 @@ const useCreateOrganization = () => {
   };
 }
 
-const useOrganizationSubscription = () => {
-  const router = useRouter();
-  const { query } = router;
+export interface useOrganizationSubscriptionProps {
+  organizationId: string;
+}
+const useOrganizationSubscription = ({ organizationId }: useOrganizationSubscriptionProps) => {
   const { data, isLoading, error, status } = useQuery(
-    [`${query.organizationId}_subscriptions`], 
+    [`${organizationId}_subscriptions`], 
     async () => {
-      const { organizationId } = query;
       const { data }: AxiosResponse<OrganizationSubscription> = await AxoisClient.getInstance().get(`api/organizations/${organizationId}/subscription`);
       return data;
     },
@@ -78,7 +79,7 @@ const useOrganizationSubscription = () => {
   );
 
   return {
-    active: query.organizationId ? true: false,
+    active: organizationId ? true: false,
     data,
     isLoading,
     error,
@@ -129,7 +130,7 @@ const useOrganizationInvitationsMembers = ({ organizationId }: useOrganizationIn
       refetchOnWindowFocus: false
     }
   );
-
+ 
   return {
     data,
     isLoading,
@@ -137,6 +138,38 @@ const useOrganizationInvitationsMembers = ({ organizationId }: useOrganizationIn
   };
 };
 
+export interface useInviteMemberToOrganizationProps {
+  organizationId: string;
+}
+const useInviteMemberToOrganization = ({ organizationId }: useInviteMemberToOrganizationProps) => {
+  const router = useRouter();
+  const { mutateAsync, isLoading, error, status } = useMutation(
+    async (data: OrganizationMemberInviteFormValues) => {
+      return AxoisClient.getInstance().post('api/organizations', { ...data });
+    }
+  );
+
+  const invite = async (data: OrganizationMemberInviteFormValues) => {
+    const promise = mutateAsync(data);
+    toast.promise(promise, {
+      loading: 'Please wait...',
+      success: 'Member invited Successfully',
+      error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
+    }).then(async (value) => {
+      if (value.status === 200) {
+        await queryClient.invalidateQueries([`${organizationId}_invitations`]);
+      }
+    }).catch(() => {
+    });
+  };
+
+  return {
+    invite,
+    isLoading,
+    error,
+    status,
+  };
+}
 
 export {
   useOrganizationSubscription,
@@ -144,4 +177,5 @@ export {
   useCreateOrganization,
   useOrganizationMembers,
   useOrganizationInvitationsMembers,
+  useInviteMemberToOrganization,
 };

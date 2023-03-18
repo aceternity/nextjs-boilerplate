@@ -10,6 +10,7 @@ import { OrganizationFormValues } from '@components/forms/OrganizationForm/Organ
 export type CheckoutBody = {
   priceId: string | undefined;
   organization: OrganizationFormValues | undefined;
+  organizationId: string | undefined;
 }
 
 interface CheckoutApiRequest extends NextApiRequestWithSession {
@@ -28,7 +29,7 @@ handler.post(async (
   res: NextApiResponse<CheckoutData>
 ) => {
   const user = req.session?.user;
-  const { priceId, organization } = req.body;
+  const { priceId, organization, organizationId } = req.body;
 
   const currentUser = await prisma.user.findUnique({
     where: { id: user?.id as string }
@@ -43,6 +44,10 @@ handler.post(async (
       }
     });
   }
+
+  const orgId: string | null = createdOrganization && createdOrganization.id ? createdOrganization.id : (
+      organizationId ? organizationId: null
+    );
 
   const params: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
@@ -59,10 +64,10 @@ handler.post(async (
       metadata: {
         userId: user?.id || null,
         email: user?.email || null,
-        organizationId: createdOrganization ? createdOrganization.id : null
+        organizationId: orgId,
       }
     },
-    success_url: `${req.headers.origin}/pricing`,
+    success_url:  orgId ? `${req.headers.origin}/organizations/${orgId}/billing`: `${req.headers.origin}/pricing`,
     cancel_url: `${req.headers.origin}/pricing`,
   };
 
