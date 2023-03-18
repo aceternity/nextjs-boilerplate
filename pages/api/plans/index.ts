@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@lib/prisma'
+import { Prisma } from '@prisma/client';
+import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
 
 function sortPlansByUnitAmount(plans: Plan[]): Plan[] {
   return plans.sort((a, b) => {
@@ -37,14 +39,27 @@ export type PlansData = {
   }
 }
 
+export interface PlansApiRequest extends NextApiRequest {
+  query: Partial<{ [key: string]: string | string[] | undefined }> & { isOrganization?: boolean };
+}
+
 export default async function handler(
-  req: NextApiRequest,
+  req: PlansApiRequest,
   res: NextApiResponse<PlansData>
 ) {
+
+  const { isOrganization } = req.query;
+
+  const where: Prisma.ProductWhereInput = {
+    active: true,
+  };
+
+  if (isOrganization) {
+    where.uniqueIdentifier = SUBSCRIPTION_PLAN.TEAMS;
+  }
+
   const plans: Plan[] = await prisma.product.findMany({
-    where: {
-      active: true,
-    },
+    where,
     select: {
       productId: true,
       name: true,

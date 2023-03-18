@@ -38,46 +38,6 @@ export default class StripeWebhook {
   public async handleEvent(prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">, event: Stripe.Event): Promise<void> {
     
     switch (event.type) {
-      case 'product.created': {
-        const product = event.data.object as Stripe.Product;
-        await prisma.product.create({
-          data: {
-            name: product.name,
-            description: product.description,
-            productId: product.id,
-            active: product.active,
-            defaultPrice: undefined,
-            uniqueIdentifier: product.metadata.uniqueIdentifier || '',
-          },
-        });
-      }
-      case 'product.updated': {
-        const product = event.data.object as Stripe.Product;
-        const defaultPriceId = product.default_price?.toString();
-        const defaultPriceExists = await prisma.productPrice.findUnique({
-          where: { priceId: defaultPriceId },
-        });
-      
-        const data = {
-          name: product.name,
-          description: product.description,
-          productId: product.id,
-          active: product.active,
-          updatedAt: new Date(product.updated),
-          uniqueIdentifier: product.metadata.uniqueIdentifier || '',
-          defaultPrice: defaultPriceExists
-            ? {
-                connect: { priceId: defaultPriceId },
-              }
-            : undefined,
-        };
-      
-        await prisma.product.update({
-          where: { productId: product.id },
-          data,
-        });
-        break;
-      }
       case 'product.deleted': {
         const product = event.data.object as Stripe.Product;
         await prisma.product.delete({
@@ -87,6 +47,7 @@ export default class StripeWebhook {
         });
         break;
       }
+      case 'price.updated': 
       case 'price.created': {
         const price = event.data.object as Stripe.Price;
         const productExists = await prisma.product.findUnique({
@@ -110,9 +71,26 @@ export default class StripeWebhook {
           // handle the error appropriately, e.g. log it or throw an error
           console.error(`Product not found for price ${price.id}`);
         }
-        await prisma.productPrice.create({
-          data: {
+        await prisma.productPrice.upsert({
+          where: {
             priceId: price.id as string,
+          },
+          create: {
+            priceId: price.id as string,
+            product: {
+              connect: {
+                productId: price.product as string
+              }
+            },
+            interval: price.recurring?.interval,
+            interval_count: price.recurring?.interval_count,
+            description: '',
+            active: price.active,
+            currency: price.currency,
+            type: price.type,
+            unitAmount: price.unit_amount || 0,
+          },
+          update: {
             product: {
               connect: {
                 productId: price.product as string
@@ -129,57 +107,12 @@ export default class StripeWebhook {
         })
         break;
       }
-      case 'price.updated': {
-        const price = event.data.object as Stripe.Price;
-        const productExists = await prisma.product.findUnique({
-          where: { productId: price.product as string },
-        });
       
-        if (!productExists) {
-          // fetch the product from Stripe
-          const stripeProduct = await this.stripe.products.retrieve(price.product as string);
-          // create the product in the database
-          await prisma.product.create({
-            data: {
-              name: stripeProduct.name,
-              description: stripeProduct.description,
-              productId: stripeProduct.id,
-              active: stripeProduct.active,
-              defaultPrice: undefined,
-              uniqueIdentifier: stripeProduct.metadata.uniqueIdentifier || '',
-            },
-          });
-          // handle the error appropriately, e.g. log it or throw an error
-          console.error(`Product not found for price ${price.id}`);
-        }
-      
-        const data = {
-          priceId: price.id as string,
-          product: {
-            connect: { productId: price.product as string },
-          },
-          interval: price.recurring?.interval,
-          interval_count: price.recurring?.interval_count,
-          description: '',
-          active: price.active,
-          currency: price.currency,
-          type: price.type,
-          unitAmount: price.unit_amount || 0,
-        };
-      
-        await prisma.productPrice.create({
-          data,
-        });
-        break;
-      }
       case 'price.deleted':  {
         const price = event.data.object as Stripe.Price;
-        await prisma.productPrice.update({
+        await prisma.productPrice.delete({
           where: {
             priceId: price.id,
-          },
-          data: {
-            active: false
           }
         });
         break;
@@ -199,6 +132,7 @@ export default class StripeWebhook {
         const customerId = subscription.customer.toString();
         const { metadata } = subscription;
 
+        const { organizationId } = metadata;
         const user = await prisma.user.findUnique({
           where: {
             id: metadata.userId
@@ -209,7 +143,8 @@ export default class StripeWebhook {
         });
 
         if (user) {
-          await prisma.subscription.upsert({
+
+          const subscrptionUpsert:Prisma.SubscriptionUpsertArgs = {
             where: {
               subscriptionId: subscription.id,
             },
@@ -230,7 +165,54 @@ export default class StripeWebhook {
               startDate: new Date(subscription.current_period_start * 1000),
               endDate: new Date(subscription.current_period_end * 1000),
             }
-          });
+          };
+
+          if (organizationId) {
+            subscrptionUpsert.create.organization = {
+              connect: { id: organizationId }
+            };
+
+            subscrptionUpsert.update.organization = {
+              connect: { id: organizationId }
+            }
+          }
+          
+          await prisma.subscription.upsert(subscrptionUpsert);
+          
+          if (organizationId) {
+            try {
+              await prisma.organizationMember.create({
+                data: {
+                  role: 'org_admin',
+                  organization: {
+                    connect: { id: organizationId }
+                  },
+                  user: {
+                    connect: { id: metadata.userId }
+                  }
+                }
+              });
+
+              await prisma.organization.update({
+                where:  { id: organizationId },
+                data: { 
+                  status: subscription.status === 'active' ? 'active': 'inactive',
+                  users: {
+                    connect: { id: metadata.userId }
+                  }
+                }
+              });
+            } catch (e) {
+              if (e instanceof Prisma.PrismaClientKnownRequestError) {
+                // The .code property can be accessed in a type-safe manner
+                if (e.code === 'P2002') {
+                  console.log(
+                    'There is a unique constraint violation, a new user cannot be created with this email'
+                  )
+                }
+              }
+            }
+          }
 
           if (!user.stripeCustomerId) {
             await prisma.user.update({ 

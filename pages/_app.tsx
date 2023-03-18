@@ -32,7 +32,7 @@ const App = ({ Component, pageProps }: AppPropsWithExtra<{ session: Session; }>)
   const { session } = pageProps;
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider session={session}>
+      <SessionProvider refetchOnWindowFocus={false} session={session}>
         {Component.requireAuth ? (
             <AuthGuard roles={Component.roles}>
               {Component.requireSubscription ? (

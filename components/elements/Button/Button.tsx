@@ -5,7 +5,7 @@ interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, 'size'> {
   variant?: 'primary' | 'secondary' | 'warning' | 'danger';
   children: React.ReactNode;
   onClick?: () => void;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sx' | 'sm' | 'md' | 'lg';
   type?: 'button' | 'submit' | 'reset';
   loading?: boolean;
   disabled?: boolean;
@@ -30,6 +30,8 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
 
   const getSizeClasses = () => {
     switch (size) {
+      case 'sx':
+        return 'px-2 text-xs';
       case 'sm':
         return 'px-2 py-1 text-sm';
       case 'lg':
@@ -46,7 +48,7 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
       onClick={onClick}
       className={classNames(
         classes,
-        `px-4 py-2 rounded-md font-medium transition duration-200 focus:outline-none`,
+        `px-4 py-2 rounded-md flex justify-center items-center gap-1 font-medium transition duration-200 focus:outline-none`,
         getVariantClasses(),
         getSizeClasses(),
         fullWidth ? 'w-full': 'w-fit',

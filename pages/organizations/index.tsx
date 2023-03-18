@@ -8,6 +8,7 @@ import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
 import { OrganizationForm } from '@components/forms';
 import { useCreateOrganization, useOrganzations } from '@hooks/query/organizations';
 import { OrganizationData } from '@pages/api/organizations';
+import Link from 'next/link';
 
 const Organizations: NextPageWithProps = () => {
   const { data } = useOrganzations();
@@ -16,18 +17,22 @@ const Organizations: NextPageWithProps = () => {
   const columnHelper = createColumnHelper<OrganizationData>();
   const columns = [
     columnHelper.accessor('name', {
-      cell: info => info.getValue(),
+      cell: (data) => {
+        return (
+          <Link href={`/organizations/${data.row.original.id}`}>{data.getValue()}</Link>
+        )
+      },
     }),
     columnHelper.accessor('_count.invitations', {
-      header: info => 'Invitations',
+      header: () => 'Invitations',
       cell: info => info.getValue(),
     }),
     columnHelper.accessor('_count.members', {
-      header: info => 'Members',
+      header: () => 'Members',
       cell: info => info.getValue(),
     }),
     columnHelper.accessor('subscription', {
-      header: info => 'Subscription',
+      header: () => 'Subscription',
       cell: info => info.getValue() ? info.getValue().priceId: 'No Plan',
     }),
   ];
@@ -53,6 +58,6 @@ const Organizations: NextPageWithProps = () => {
 
 Organizations.requireAuth = true;
 Organizations.requireSubscription = true;
-Organizations.plans = [SUBSCRIPTION_PLAN.team];
+Organizations.plans = [SUBSCRIPTION_PLAN.TEAMS];
 
 export default Organizations;

@@ -5,11 +5,15 @@ import nextConnect from 'next-connect';
 import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
 import { Role } from '@prisma/client';
 import prisma from '@lib/prisma';
+import { OrganizationFormValues } from '@components/forms/OrganizationForm/OrganizationForm';
+
+export type CheckoutBody = {
+  priceId: string | undefined;
+  organization: OrganizationFormValues | undefined;
+}
 
 interface CheckoutApiRequest extends NextApiRequestWithSession {
-  body: {
-    priceId: string;
-  }
+  body: CheckoutBody;
 }
 
 export type CheckoutData = {
@@ -24,11 +28,21 @@ handler.post(async (
   res: NextApiResponse<CheckoutData>
 ) => {
   const user = req.session?.user;
-  const { priceId } = req.body;
+  const { priceId, organization } = req.body;
 
   const currentUser = await prisma.user.findUnique({
     where: { id: user?.id as string }
   })
+
+  let createdOrganization = null;
+  if (organization) {
+    createdOrganization = await prisma.organization.create({ 
+      data: {
+        name: organization?.name,
+        status: 'inactive'
+      }
+    });
+  }
 
   const params: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
@@ -45,6 +59,7 @@ handler.post(async (
       metadata: {
         userId: user?.id || null,
         email: user?.email || null,
+        organizationId: createdOrganization ? createdOrganization.id : null
       }
     },
     success_url: `${req.headers.origin}/pricing`,

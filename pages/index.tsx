@@ -1,3 +1,4 @@
+import PricingComponent from '@components/PricingComponent'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -10,6 +11,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <h1>Next.js Serverless Boilerplate</h1>
+      <PricingComponent />
     </div>
   )
 }

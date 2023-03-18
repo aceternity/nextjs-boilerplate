@@ -1,7 +1,6 @@
 enum SUBSCRIPTION_PLAN {
-  FREE = 'free',
   INDIVIDUAL = 'individual',
-  team = 'team',
+  TEAMS = 'teams',
 }
 
 export {

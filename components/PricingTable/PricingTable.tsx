@@ -4,7 +4,7 @@ import PricingCard from './PricingCard';
 
 interface PricingTableProps {
   data: Plan[] | undefined
-  onClickSubscribe: (priceId: string | undefined) => void;
+  onClickSubscribe: (priceId: string | undefined, uniqueIdentifier: string) => void;
 }
 
 const PricingTable = (props: PricingTableProps) => {

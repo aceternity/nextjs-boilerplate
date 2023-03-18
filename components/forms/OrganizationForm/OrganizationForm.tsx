@@ -11,6 +11,7 @@ export type OrganizationFormValues = {
 interface OrganizationFormProps {
   onSubmit: (updatedValues: OrganizationFormValues) => void;
   loading?: boolean;
+  submitLabel?: string;
 }
 
 const validationSchema: yup.ObjectSchema<OrganizationFormValues> = yup.object({
@@ -18,7 +19,7 @@ const validationSchema: yup.ObjectSchema<OrganizationFormValues> = yup.object({
 });
 
 const OrganizationForm: React.FC<OrganizationFormProps> = (props: OrganizationFormProps) => {
-  const { onSubmit, loading } = props;
+  const { onSubmit, loading, submitLabel } = props;
   const resolver = useYupValidationResolver(validationSchema);
 
   const methods = useForm<OrganizationFormValues>({
@@ -48,7 +49,7 @@ const OrganizationForm: React.FC<OrganizationFormProps> = (props: OrganizationFo
               )}
             />
           </div>
-          <Button classes="w-full" type="submit" disabled={loading}>Save</Button>
+          <Button classes="w-full" type="submit" disabled={loading}>{loading ? 'Please wait...': submitLabel}</Button>
         </div>
       </form>
     </FormProvider>
@@ -56,7 +57,7 @@ const OrganizationForm: React.FC<OrganizationFormProps> = (props: OrganizationFo
 };
 
 OrganizationForm.defaultProps = {
-
+  submitLabel: 'Save',
 };
 
 OrganizationForm.propTypes = {

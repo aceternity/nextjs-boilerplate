@@ -106,6 +106,7 @@ const useResetPassword = () => {
 
 const useSignIn = () => {
   const router = useRouter();
+  const { query } = router;
   const { mutateAsync, isLoading, error } = useMutation(
     async (data: LoginFormValues) => {
       const response = await signIn("credentials", {
@@ -127,7 +128,13 @@ const useSignIn = () => {
       success: 'Logged In...',
       error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
     }).then(() => {
-      router.replace('/dashboard');
+      const { redirect } = query;
+
+      if (redirect) {
+        router.replace(redirect as string);
+      } else {
+        router.replace('/dashboard');
+      }
     }).catch((e) => {
 
     });

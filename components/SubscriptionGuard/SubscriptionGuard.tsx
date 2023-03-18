@@ -37,7 +37,7 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = (props: Subscription
   }
 
   const { product } = data.subscription;
-  if (plans.some((plan) => plan.includes(product.uniqueIdentifier))) {
+  if (plans.some((plan) => plan?.includes(product.uniqueIdentifier))) {
     return <>{children}</>;
   } else {
     if (session?.user.role === Role.superadmin) {

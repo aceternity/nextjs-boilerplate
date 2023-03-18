@@ -5,11 +5,14 @@ import { AxiosResponse } from "axios";
 
 import { ProductsData } from '@pages/api/products';
 
-const usePlans = () => {
+export interface UsePlansProps {
+  isOrganization?: boolean;
+}
+const usePlans = ({ isOrganization }: UsePlansProps) => {
   const { data, isLoading, error } = useQuery(
     ["plans"], 
     async () => {
-      const { data }: AxiosResponse<PlansData> = await AxoisClient.getInstance().get('api/plans');
+      const { data }: AxiosResponse<PlansData> = await AxoisClient.getInstance().get(`api/plans${isOrganization ? '?isOrganization=true': ''}`);
       return data.data;
     },
     {

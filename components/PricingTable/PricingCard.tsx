@@ -7,7 +7,7 @@ interface PricingCardProps {
   currency: string;
   interval: string;
 
-  onClickSubscribe: (priceId: string | undefined) => void;
+  onClickSubscribe: (priceId: string | undefined, uniqueIdentifier: string) => void;
 }
 
 const PricingCard = (props: PricingCardProps) => {
@@ -62,7 +62,7 @@ const PricingCard = (props: PricingCardProps) => {
               <span>Free updates: <span className="font-semibold">6 months</span></span>
           </li>
       </ul>
-      <a onClick={() => onClickSubscribe(price?.priceId)} className="cursor-pointer bg-blue-500 text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-cente">
+      <a onClick={() => onClickSubscribe(price?.priceId, data.uniqueIdentifier)} className="cursor-pointer bg-blue-500 text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-cente">
         Get started
       </a>
     </div>

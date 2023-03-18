@@ -118,12 +118,14 @@ model OrganizationMember {
   user           User?          @relation(fields: [userId], references: [id])
   userId         String?
 
-  role            OrganizationRole  @default(org_user)
+  role           OrganizationRole  @default(org_user)
 
   organization   Organization  @relation(fields: [organizationId], references: [id])
   organizationId String
   createdAt      DateTime       @default(now())
   updatedAt      DateTime?      @updatedAt
+
+  @@unique([userId, organizationId])
 }
 
 enum OrganizationInvitationStatus {
