@@ -25,6 +25,6 @@ const Organization: NextPageWithProps = () => {
 
 Organization.requireAuth = true;
 Organization.requireSubscription = true;
-Organization.plans = [SUBSCRIPTION_PLAN.team];
+Organization.plans = [SUBSCRIPTION_PLAN.TEAMS];
 
 export default Organization;

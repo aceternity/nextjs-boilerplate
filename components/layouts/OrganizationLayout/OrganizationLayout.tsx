@@ -16,7 +16,7 @@ interface OrganizationLayoutProps {
 const OrganizationLayout = (props: OrganizationLayoutProps) => {
   const { children, tab } = props;
   const router = useRouter();
-  const { id } = router.query;
+  const { organizationId } = router.query;
 
 
   const getOrganizationTabs = (id: string) => {
@@ -48,7 +48,7 @@ const OrganizationLayout = (props: OrganizationLayoutProps) => {
         <IoReturnUpBackOutline className='text-2xl'/>
       </Link>
       <div className="flex flex-col flex-no-wrap">
-        <Tabs items={getOrganizationTabs(id as string)} defaultTab={tab} />
+        <Tabs items={getOrganizationTabs(organizationId as string)} defaultTab={tab} />
         {children}
       </div>
     </Flex>

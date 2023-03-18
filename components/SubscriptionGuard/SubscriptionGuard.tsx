@@ -1,6 +1,6 @@
 import React from 'react';
 import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
-import { useUserSubscription } from '@hooks/query/subscription';
+import { useSubscription } from '@hooks/query/subscription';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { Role } from '@prisma/client';
@@ -12,7 +12,7 @@ interface SubscriptionGuardProps {
 
 const SubscriptionGuard: React.FC<SubscriptionGuardProps> = (props: SubscriptionGuardProps) => {
   const { children, plans } = props;
-  const { data, status } = useUserSubscription();
+  const { data, status } = useSubscription();
   const { data: session } = useSession();
   const router = useRouter();
   

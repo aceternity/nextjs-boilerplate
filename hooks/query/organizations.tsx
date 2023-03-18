@@ -6,6 +6,9 @@ import { useRouter } from "next/router";
 import { OrganizationFormValues } from "@components/forms/OrganizationForm/OrganizationForm";
 import { toast } from "react-hot-toast";
 import { queryClient } from "@pages/_app";
+import { OrganizationSubscription } from "@pages/api/organizations/[id]/subscription";
+import { OrganizationMembersData } from "@pages/api/organizations/[id]/members";
+import { OrganizationInvitationsMembersData } from "@pages/api/organizations/[id]/invitations";
 
 const useOrganzations = () => {
   const { data, isLoading, error } = useQuery(
@@ -57,7 +60,88 @@ const useCreateOrganization = () => {
   };
 }
 
+const useOrganizationSubscription = () => {
+  const router = useRouter();
+  const { query } = router;
+  const { data, isLoading, error, status } = useQuery(
+    [`${query.organizationId}_subscriptions`], 
+    async () => {
+      const { organizationId } = query;
+      const { data }: AxiosResponse<OrganizationSubscription> = await AxoisClient.getInstance().get(`api/organizations/${organizationId}/subscription`);
+      return data;
+    },
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: false,
+    }
+  );
+
+  return {
+    active: query.organizationId ? true: false,
+    data,
+    isLoading,
+    error,
+    status,
+  };
+};
+
+
+export interface useOrganizationMembersProps {
+  organizationId: string;
+}
+const useOrganizationMembers = ({ organizationId }: useOrganizationMembersProps) => {
+
+  const { data, isLoading, error } = useQuery(
+    [`${organizationId}_members`], 
+    async () => {
+      const { data }: AxiosResponse<OrganizationMembersData> = await AxoisClient.getInstance().get(
+        `api/organizations/${organizationId}/members`
+      );
+      return data;
+    },
+    {
+      refetchOnWindowFocus: false
+    }
+  );
+
+  return {
+    data,
+    isLoading,
+    error,
+  };
+};
+
+export interface useOrganizationInvitationsMembersProps {
+  organizationId: string;
+}
+const useOrganizationInvitationsMembers = ({ organizationId }: useOrganizationInvitationsMembersProps) => {
+
+  const { data, isLoading, error } = useQuery(
+    [`${organizationId}_invitations`], 
+    async () => {
+      const { data }: AxiosResponse<OrganizationInvitationsMembersData> = await AxoisClient.getInstance().get(
+        `api/organizations/${organizationId}/invitaions`
+      );
+      return data;
+    },
+    {
+      refetchOnWindowFocus: false
+    }
+  );
+
+  return {
+    data,
+    isLoading,
+    error,
+  };
+};
+
+
 export {
+  useOrganizationSubscription,
   useOrganzations,
   useCreateOrganization,
+  useOrganizationMembers,
+  useOrganizationInvitationsMembers,
 };

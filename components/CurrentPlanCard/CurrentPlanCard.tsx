@@ -1,22 +1,27 @@
 import { Button } from '@components/elements';
-import { useUserManageSubscriptionBilling, useUserSubscription } from '@hooks/query/subscription';
+import { useUserManageSubscriptionBilling, useSubscription } from '@hooks/query/subscription';
 import { getPrice } from '@utils/pricing';
 import React from 'react';
 import PricingComponent from '@components/PricingComponent';
+import { useOrganizationSubscription } from '@hooks/query/organizations';
 
 interface CurrentPlanCardProps {
+  isOrganization?: boolean;
 }
 
 const CurrentPlanCard: React.FC<CurrentPlanCardProps> = (props: CurrentPlanCardProps) => {
+
+  const { isOrganization } = props;
+
   const { openBilling, isLoading: apiLoading } = useUserManageSubscriptionBilling();
-  const { data: subscriptionData, isLoading } = useUserSubscription();
+  const { data: subscriptionData, isLoading } = isOrganization ? useOrganizationSubscription():  useSubscription();
 
   if (isLoading) {
     return <>Please wait...</>;
   }
   
   if (!subscriptionData || !subscriptionData.subscription) {
-    return <PricingComponent />
+    return <PricingComponent isOrganization />
   }
   const { subscription } = subscriptionData;
 

@@ -6,11 +6,16 @@ import { UserSubscription } from "@pages/api/subscription";
 import { ManageBillingData } from "@pages/api/subscription/manage";
 import { useRouter } from "next/router";
 
-const useUserSubscription = () => {
+const useSubscription = () => {
+  const router = useRouter();
+
+  
   const { data, isLoading, error, status } = useQuery(
     ["subscriptions"], 
     async () => {
-      const { data }: AxiosResponse<UserSubscription> = await AxoisClient.getInstance().get('api/subscription');
+      const { query } = router;
+      
+      const { data }: AxiosResponse<UserSubscription> = await AxoisClient.getInstance().get(`api/subscription`);
 
       return data;
     },
@@ -61,6 +66,6 @@ const useUserManageSubscriptionBilling = () => {
 }
 
 export {
-  useUserSubscription,
+  useSubscription,
   useUserManageSubscriptionBilling
 };

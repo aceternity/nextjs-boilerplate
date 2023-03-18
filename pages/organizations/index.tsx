@@ -31,9 +31,9 @@ const Organizations: NextPageWithProps = () => {
       header: () => 'Members',
       cell: info => info.getValue(),
     }),
-    columnHelper.accessor('subscription', {
-      header: () => 'Subscription',
-      cell: info => info.getValue() ? info.getValue().priceId: 'No Plan',
+    columnHelper.accessor('subscription.status', {
+      header: () => 'Subscription Status',
+      cell: info => info.getValue() ? info.getValue(): 'No Plan',
     }),
   ];
 
