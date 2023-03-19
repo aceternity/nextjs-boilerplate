@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { DialogComponent, Flex, MainLayout, Table } from '@components/index';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -12,6 +12,8 @@ import Link from 'next/link';
 
 const Organizations: NextPageWithProps = () => {
   const { data } = useOrganizations();
+
+  const [open, setOpen] = useState(false);
   const { createOrganization, isLoading: createLoading } = useCreateOrganization();
   
   const columnHelper = createColumnHelper<OrganizationData>();
@@ -41,8 +43,8 @@ const Organizations: NextPageWithProps = () => {
     <MainLayout>
       <Flex gap='2' direction="col">
         <div className='flex justify-end'>
-          <DialogComponent buttonText="Add new Organization">
-              <OrganizationForm onSubmit={createOrganization} loading={createLoading} />
+          <DialogComponent onOpenChange={setOpen} open={open} buttonText="Add new Organization">
+              <OrganizationForm onSubmit={(e) => createOrganization(e, setOpen)} loading={createLoading} />
           </DialogComponent>
         </div>
         <Table

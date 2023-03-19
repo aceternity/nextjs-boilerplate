@@ -100,10 +100,8 @@ const MainLayout = (props: MainLayoutProps) => {
               </div>
               <Menu items={preparedMenu} />
           </div>
-          <div className="flex items-center flex-col py-4 justify-center border-gray-700">
-            <div>
+          <div className="flex items-center flex-col py-4 pr-4 justify-center border-gray-700">
               <UserCard />
-            </div>
           </div>
       </div>
       <div ref={ref} className={

@@ -20,7 +20,9 @@ interface PricingComponentProps {
 
 const PricingComponent: React.FC<PricingComponentProps> = (props: PricingComponentProps) => {
   const { organizationId = undefined, isCreateOrganization = false } = props;
-  const { isLoading, data } = usePlans({ isOrganization: (organizationId || isCreateOrganization) ? true: false });
+
+
+  const { isLoading, data } = usePlans({ isOrganization: organizationId ? true: false });
   const { data: authSession } = useSession();
   const router = useRouter();
 

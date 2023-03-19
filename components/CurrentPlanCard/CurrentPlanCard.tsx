@@ -7,11 +7,12 @@ import { useOrganizationSubscription } from '@hooks/query/organizations';
 
 interface CurrentPlanCardProps {
   organizationId?: string;
+  isCreateOrganization?: boolean;
 }
 
 const CurrentPlanCard: React.FC<CurrentPlanCardProps> = (props: CurrentPlanCardProps) => {
 
-  const { organizationId } = props;
+  const { organizationId, isCreateOrganization } = props;
 
   const { openBilling, isLoading: apiLoading } = useUserManageSubscriptionBilling();
   const { data: subscriptionData, isLoading } = organizationId ? useOrganizationSubscription({ organizationId }):  useSubscription();
@@ -21,7 +22,7 @@ const CurrentPlanCard: React.FC<CurrentPlanCardProps> = (props: CurrentPlanCardP
   }
   
   if (!subscriptionData || !subscriptionData.subscription) {
-    return <PricingComponent organizationId={organizationId} />
+    return <PricingComponent isCreateOrganization={isCreateOrganization} organizationId={organizationId} />
   }
   const { subscription } = subscriptionData;
 

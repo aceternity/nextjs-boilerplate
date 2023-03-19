@@ -7,7 +7,7 @@ const PrcingPage: NextPageWithProps = () => {
 
   return (
     <MainLayout>
-     <CurrentPlanCard />
+     <CurrentPlanCard isCreateOrganization />
     </MainLayout>
   )
 }

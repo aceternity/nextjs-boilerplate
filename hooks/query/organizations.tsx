@@ -39,7 +39,7 @@ const useCreateOrganization = () => {
     }
   );
 
-  const createOrganization = async (data: OrganizationFormValues) => {
+  const createOrganization = async (data: OrganizationFormValues,  setOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
     const promise = mutateAsync(data);
     toast.promise(promise, {
       loading: 'Please wait...',
@@ -48,6 +48,7 @@ const useCreateOrganization = () => {
     }).then(async (value) => {
       if (value.status === 200) {
         await queryClient.invalidateQueries(['organizations']);
+        setOpen(false);
       }
     }).catch(() => {
     });

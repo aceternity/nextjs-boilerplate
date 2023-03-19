@@ -14,14 +14,14 @@ const UserCard: React.FC<UserCardProps> = (props: UserCardProps) => {
       <div className="flex items-center md:order-2">
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button className="flex items-center pr-4">
+            <button className="flex justify-between w-full items-center">
               <span className="sr-only">Open user menu</span>
               <div className="px-4 flex flex-col items-center py-3">
                 <span className="block text-gray-300 text-sm">{session?.user.name}</span>
                 <span className="block font-medium truncate text-gray-300 text-[0.6rem]">{session?.user.email}</span>
               </div>
-              {session?.user.image && <img className="w-10 h-10 rounded-full" src={session?.user.image} alt="user photo" />}
-              {!session?.user.image && <RxAvatar className='w-10 h-10 text-white'/>}
+              {session?.user.image && <img className="w-8 h-8 rounded-full" src={session?.user.image} alt="user photo" />}
+              {!session?.user.image && <RxAvatar className='w-8 h-8 text-white'/>}
             </button>
           </Popover.Trigger>
           <Popover.Portal >
