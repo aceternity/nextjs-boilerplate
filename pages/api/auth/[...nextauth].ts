@@ -43,8 +43,16 @@ export const nextAuthOptions: NextAuthOptions = {
           role: true,
           id: true,
           name: true,
+          memberInOrganizations: {
+            select: {
+              id: true,
+              role: true,
+            }
+          }
         }
       });
+      // if member detail registered as OrganizationMember it will be true
+      session.user.isOrganizationUser = user?.memberInOrganizations && user?.memberInOrganizations.length > 0;
 
       session.user.name = user?.name as string;
       session.user.role = user?.role as string;
