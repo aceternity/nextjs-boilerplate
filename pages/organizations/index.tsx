@@ -6,12 +6,12 @@ import { NextPageWithProps } from '@pages/_app';
 
 import { SUBSCRIPTION_PLAN } from '@lib/payments/constants';
 import { OrganizationForm } from '@components/forms';
-import { useCreateOrganization, useOrganzations } from '@hooks/query/organizations';
+import { useCreateOrganization, useOrganizations } from '@hooks/query/organizations';
 import { OrganizationData } from '@pages/api/organizations';
 import Link from 'next/link';
 
 const Organizations: NextPageWithProps = () => {
-  const { data } = useOrganzations();
+  const { data } = useOrganizations();
   const { createOrganization, isLoading: createLoading } = useCreateOrganization();
   
   const columnHelper = createColumnHelper<OrganizationData>();

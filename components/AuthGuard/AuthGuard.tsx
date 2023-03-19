@@ -30,7 +30,7 @@ const AuthGuard: React.FC<AuthGuardProps> = (props: AuthGuardProps) => {
 
 
   if (status === 'unauthenticated') {
-    router.replace("/auth/login");
+    router.replace(`/auth/register?redirect=${router.asPath}`);
     return <></>;
   }
   

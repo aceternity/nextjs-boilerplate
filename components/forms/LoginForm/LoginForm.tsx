@@ -13,6 +13,7 @@ import { VscGithub } from 'react-icons/vsc';
 import { BsFacebook, BsTwitter } from 'react-icons/bs';
 
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 export const AuthDivider = () => {
   return (
@@ -25,8 +26,13 @@ export const AuthDivider = () => {
 interface SocialAuthProps {
   providers: Record<LiteralUnion<BuiltInProviderType, string>, ClientSafeProvider> | null,
   loading: boolean | undefined;
+  redirect?: string;
 }
-export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
+export const SocialAuth = ({ providers, loading, redirect }: SocialAuthProps) => {
+
+  const signInHandler = (id: LiteralUnion<BuiltInProviderType, string>) => {
+    signIn(id, { redirect: true, callbackUrl: redirect || '/dashboard' })
+  }
 
   const buttonCommonClasses = "w-full text-sm rounded-md justify-center font-medium py-2 border px-4 flex items-center gap-2 text-secondary-600 hover:underline dark:text-secondary-500";
 
@@ -39,8 +45,9 @@ export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
             case 'google':
               return (
               <button 
+                key={providers[providerKey].id}
                 disabled={loading}
-                onClick={() => signIn(providers[providerKey].id)}
+                onClick={() => signInHandler(providers[providerKey].id)}
                 className={classNames(
                   buttonCommonClasses,
                   )}>
@@ -51,8 +58,9 @@ export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
             case 'github':
               return (
               <button 
+                key={providers[providerKey].id}
                 disabled={loading} 
-                onClick={() => signIn(providers[providerKey].id)}
+                onClick={() => signInHandler(providers[providerKey].id)}
                 className={classNames(
                   buttonCommonClasses, 
                 )}>
@@ -63,8 +71,9 @@ export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
             case 'twitter':
               return (
               <button 
+                key={providers[providerKey].id}
                 disabled={loading} 
-                onClick={() => signIn(providers[providerKey].id)}
+                onClick={() => signInHandler(providers[providerKey].id)}
                 className={classNames(
                   buttonCommonClasses, 
                 )}>
@@ -75,8 +84,9 @@ export const SocialAuth = ({ providers, loading }: SocialAuthProps) => {
             case 'facebook':
               return (
               <button 
+                key={providers[providerKey].id}
                 disabled={loading} 
-                onClick={() => signIn(providers[providerKey].id)}
+                onClick={() => signInHandler(providers[providerKey].id)}
                 className={classNames(
                   buttonCommonClasses, 
                 )}>
@@ -100,7 +110,7 @@ export type LoginFormValues = {
 interface LoginFormProps {
   loading?: boolean;
   providers: Record<LiteralUnion<BuiltInProviderType, string>, ClientSafeProvider> | null,
-  onSubmit: (updatedValues: LoginFormValues) => void;
+  onSubmit: (updatedValues: LoginFormValues, redirect?: string) => void;
 }
 
 const validationSchema: yup.ObjectSchema<LoginFormValues> = yup.object({
@@ -110,6 +120,9 @@ const validationSchema: yup.ObjectSchema<LoginFormValues> = yup.object({
 
 
 const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
+  const router = useRouter();
+  const { redirect } = router.query;
+  const defaultRedirect = redirect as string || '/dashboard';
 
   const resolver = useYupValidationResolver(validationSchema);
   const { loading, onSubmit, providers } = props;
@@ -120,14 +133,17 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
     resolver
   });
 
+  const onSubmitHandler = (values: LoginFormValues) => { 
+    onSubmit(values, defaultRedirect);
+  } 
   
   return (
     <>
-    <SocialAuth providers={providers} loading={loading} />
+    <SocialAuth redirect={defaultRedirect} providers={providers} loading={loading} />
     <AuthDivider />
     {providers && providers?.credentials && (
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
+        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
@@ -175,7 +191,12 @@ const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
             </div>
             <Button classes="w-full" type="submit" disabled={loading}>Sign in</Button>
             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-              Don’t have an account yet? <Link href={'/auth/register'}><button disabled={loading} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</button></Link>
+              Don’t have an account yet? 
+              <Link 
+                href={`/auth/register${redirect as string ? `?redirect=${redirect as string}`: ''}`}
+              >
+                <button disabled={loading} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</button>
+              </Link>
             </p>
           </div>
         </form>

@@ -18,6 +18,7 @@
     "bcryptjs": "^2.4.3",
     "classnames": "^2.3.2",
     "form-data": "^4.0.0",
+    "jsonwebtoken": "^9.0.0",
     "mailgun-js": "^0.22.0",
     "mailgun.js": "^8.2.1",
     "micro": "^10.0.1",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.1",
     "@types/mailgun-js": "^0.22.13",
     "@types/next": "^9.0.0",
     "@types/node": "18.11.3",

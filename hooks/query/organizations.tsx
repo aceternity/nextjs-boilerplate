@@ -11,7 +11,7 @@ import { OrganizationMembersData } from "@pages/api/organizations/[id]/members";
 import { OrganizationInvitationsMembersData } from "@pages/api/organizations/[id]/invitations";
 import { OrganizationMemberInviteFormValues } from "@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm";
 
-const useOrganzations = () => {
+const useOrganizations = () => {
   const { data, isLoading, error } = useQuery(
     ["organizations"], 
     async () => {
@@ -122,7 +122,7 @@ const useOrganizationInvitationsMembers = ({ organizationId }: useOrganizationIn
     [`${organizationId}_invitations`], 
     async () => {
       const { data }: AxiosResponse<OrganizationInvitationsMembersData> = await AxoisClient.getInstance().get(
-        `api/organizations/${organizationId}/invitaions`
+        `api/organizations/${organizationId}/invitations`
       );
       return data;
     },
@@ -145,7 +145,7 @@ const useInviteMemberToOrganization = ({ organizationId }: useInviteMemberToOrga
   const router = useRouter();
   const { mutateAsync, isLoading, error, status } = useMutation(
     async (data: OrganizationMemberInviteFormValues) => {
-      return AxoisClient.getInstance().post('api/organizations', { ...data });
+      return AxoisClient.getInstance().post(`api/organizations/${organizationId}/invitations`, { ...data });
     }
   );
 
@@ -171,11 +171,47 @@ const useInviteMemberToOrganization = ({ organizationId }: useInviteMemberToOrga
   };
 }
 
+export interface useAcceptInvitationProps {
+  token: string;
+}
+const useAcceptInvitation = ({ token }: useAcceptInvitationProps) => {
+  const router = useRouter();
+  const { mutateAsync, isLoading, error, status } = useMutation(
+    async () => {
+      return AxoisClient.getInstance().post(`api/invitations/accept`, { token });
+    }
+  );
+
+  const accept = async () => {
+    const promise = mutateAsync();
+    toast.promise(promise, {
+      loading: 'Please wait...',
+      success: 'Member invited Successfully',
+      error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
+    }).then(async (value) => {
+      if (value.status === 200) {
+        const { organizationId } = value.data;
+        router.replace(`/organizations/${organizationId}/`);
+      }
+    }).catch(() => {
+      router.replace(`/dashboard`);
+    });
+  };
+
+  return {
+    accept,
+    isLoading,
+    error,
+    status,
+  };
+}
+
 export {
   useOrganizationSubscription,
-  useOrganzations,
+  useOrganizations,
   useCreateOrganization,
   useOrganizationMembers,
   useOrganizationInvitationsMembers,
   useInviteMemberToOrganization,
+  useAcceptInvitation,
 };

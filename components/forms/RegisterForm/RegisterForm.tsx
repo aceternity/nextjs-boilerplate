@@ -8,6 +8,7 @@ import { LiteralUnion, ClientSafeProvider } from 'next-auth/react';
 import { BuiltInProviderType } from 'next-auth/providers';
 import Link from 'next/link';
 import { AuthDivider, SocialAuth } from '../LoginForm/LoginForm';
+import { useRouter } from 'next/router';
 
 export type RegisterFormValues = {
   name: string;
@@ -18,7 +19,7 @@ export type RegisterFormValues = {
 interface RegisterFormProps {
   loading?: boolean;
   providers: Record<LiteralUnion<BuiltInProviderType, string>, ClientSafeProvider> | null,
-  onSubmit: (updatedValues: RegisterFormValues, formInstance: UseFormReturn<RegisterFormValues, any>) => void;
+  onSubmit: (updatedValues: RegisterFormValues, formInstance: UseFormReturn<RegisterFormValues, any>, redirect?: string) => void;
 }
 
 const validationSchema: yup.ObjectSchema<RegisterFormValues> = yup.object({
@@ -29,6 +30,9 @@ const validationSchema: yup.ObjectSchema<RegisterFormValues> = yup.object({
 
 
 const RegisterForm: React.FC<RegisterFormProps> = (props: RegisterFormProps) => {
+  const router = useRouter();
+  const { redirect } = router.query;
+  const defaultRedirect = redirect ? `/login?redirect=${redirect}` : '/login';
 
   const resolver = useYupValidationResolver(validationSchema);
   const { loading, onSubmit, providers } = props;
@@ -40,12 +44,12 @@ const RegisterForm: React.FC<RegisterFormProps> = (props: RegisterFormProps) => 
   });
 
   const handleSubmit = (values: RegisterFormValues) => {
-    onSubmit(values, methods)
+    onSubmit(values, methods, defaultRedirect);
   }
 
   return (
     <>
-    <SocialAuth providers={providers} loading={loading} />
+    <SocialAuth redirect={defaultRedirect} providers={providers} loading={loading} />
     <AuthDivider />
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(handleSubmit)}>
@@ -114,7 +118,7 @@ const RegisterForm: React.FC<RegisterFormProps> = (props: RegisterFormProps) => 
           </div>
           <Button classes="w-full" type="submit" disabled={loading}>Sign up</Button>
           <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-            Have an account? <Link href={'/auth/login'}><button disabled={loading} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</button></Link>
+            Have an account? <Link href={`/auth/login${redirect as string ? `?redirect=${redirect as string}`: ''}`}><button disabled={loading} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</button></Link>
           </p>
         </div>
       </form>

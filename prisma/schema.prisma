@@ -151,6 +151,10 @@ model OrganizationMemberInvitation {
   status          OrganizationInvitationStatus      @default(pending)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  expiresAt       DateTime
+
+  @@unique([email, organizationId])
 }
 
 enum ProductType {

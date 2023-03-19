@@ -106,7 +106,6 @@ const useResetPassword = () => {
 
 const useSignIn = () => {
   const router = useRouter();
-  const { query } = router;
   const { mutateAsync, isLoading, error } = useMutation(
     async (data: LoginFormValues) => {
       const response = await signIn("credentials", {
@@ -121,15 +120,13 @@ const useSignIn = () => {
     }
   );
 
-  const login = async (data: LoginFormValues) => {
+  const login = async (data: LoginFormValues, redirect?: string | undefined) => {
     const promise = mutateAsync(data);
     toast.promise(promise, {
       loading: 'Please wait...',
       success: 'Logged In...',
       error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
     }).then(() => {
-      const { redirect } = query;
-
       if (redirect) {
         router.replace(redirect as string);
       } else {
@@ -155,7 +152,7 @@ const useSignup = () => {
     }
   );
 
-  const signup = async (data: RegisterFormValues,  formInstance: UseFormReturn<RegisterFormValues, any>) => {
+  const signup = async (data: RegisterFormValues,  formInstance: UseFormReturn<RegisterFormValues, any>, redirect?: string) => {
     const promise = mutateAsync(data);
     toast.promise(promise, {
       loading: 'Please wait...',
@@ -164,7 +161,7 @@ const useSignup = () => {
     }).then((value) => {
       if (value.status === 200) {
         formInstance.reset();
-        router.replace('/auth/login');
+        router.replace(`/auth/login${redirect ? `?redirect=${redirect}`: ''}`);
       }
     }).catch(() => {
       formInstance.setError('email', {  message: 'Email already used' });

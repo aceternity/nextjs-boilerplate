@@ -1,8 +1,8 @@
 import React from 'react'
-import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { AuthLayout } from '@components/index';
 import { LoginForm } from '@components/forms';
-import { ClientSafeProvider, getCsrfToken, getProviders, LiteralUnion } from 'next-auth/react';
+import { ClientSafeProvider, getProviders, LiteralUnion } from 'next-auth/react';
 import { BuiltInProviderType } from 'next-auth/providers';
 import { useSignIn } from '@hooks/query/currentUser';
 

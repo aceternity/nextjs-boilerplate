@@ -4,6 +4,10 @@ import { OrganizationInvitationStatus, OrganizationRole, Prisma, Role } from '@p
 import { createPaginator, PaginatedNextApiRequest, PaginatedResult } from '@lib/pagination';
 import nextConnect from 'next-connect';
 import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
+import { 
+  OrganizationMemberInviteFormValues 
+} from '@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm';
+import jwt from 'jsonwebtoken';
 
 export interface OrganizationInvitationMemberData {
   id: number;
@@ -52,5 +56,47 @@ handler.get(async (
   );
   res.status(200).json(result);
 });
+
+
+export interface TokenPayload {
+  email: string;
+  organizationId: string;
+}
+interface SendInivitationApiRequest extends NextApiRequestWithSession {
+  body: OrganizationMemberInviteFormValues;
+  query: Partial<{ [key: string]: string | string[] | undefined }> & { id: string };
+}
+
+handler.post(async(
+  req:  SendInivitationApiRequest,
+  res: NextApiResponse
+) => {
+  const { body, query } = req;
+  const { id } = query;
+
+  const tokenPayload: TokenPayload = {
+    email: body.email,
+    organizationId: id,
+  };
+
+  const now = new Date();
+  const expiresInMs = 60 * 60 * 1000; // 1 hour in milliseconds
+  const expiresAt = new Date(now.getTime() + expiresInMs);
+
+  const token = jwt.sign(tokenPayload, process.env.SECRET!, { expiresIn: '1h' });
+
+  await prisma.organizationMemberInvitation.create({
+    data: {
+      email: body.email,
+      organization: { connect: { id: id } },
+      token: token,
+      expiresAt: expiresAt,
+    }
+  });
+
+
+  res.status(200).json({ message: 'invitation sent'  });
+})
+
 
 export default handler;
