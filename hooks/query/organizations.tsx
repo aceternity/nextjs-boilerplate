@@ -10,6 +10,7 @@ import { OrganizationSubscription } from "@pages/api/organizations/[id]/subscrip
 import { OrganizationMembersData } from "@pages/api/organizations/[id]/members";
 import { OrganizationInvitationsMembersData } from "@pages/api/organizations/[id]/invitations";
 import { OrganizationMemberInviteFormValues } from "@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm";
+import { OrganizationMemberData } from "@pages/api/organizations/[id]/member";
 
 const useOrganizations = () => {
   const { data, isLoading, error } = useQuery(
@@ -207,6 +208,33 @@ const useAcceptInvitation = ({ token }: useAcceptInvitationProps) => {
   };
 }
 
+export interface useOrganizationMemberProps {
+  organizationId: string;
+}
+const useOrganizationMember = ({ organizationId }: useOrganizationSubscriptionProps) => {
+  const { data, isLoading, error, status } = useQuery(
+    [`${organizationId}_currentmember`], 
+    async () => {
+      const { data }: AxiosResponse<OrganizationMemberData> = 
+      await AxoisClient.getInstance().get(`api/organizations/${organizationId}/member`);
+      return data.data;
+    },
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: false,
+    }
+  );
+
+  return {
+    active: organizationId ? true: false,
+    data,
+    isLoading,
+    error,
+    status,
+  };
+};
+
 export {
   useOrganizationSubscription,
   useOrganizations,
@@ -215,4 +243,5 @@ export {
   useOrganizationInvitationsMembers,
   useInviteMemberToOrganization,
   useAcceptInvitation,
+  useOrganizationMember,
 };

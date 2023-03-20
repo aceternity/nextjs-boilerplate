@@ -7,10 +7,43 @@ import Link from 'next/link';
 import { IoReturnUpBackOutline } from 'react-icons/io5';
 import { useRouter } from 'next/router';
 import Flex from '@components/Flex';
+import { OrganizationRole } from '@prisma/client';
+import { useOrganizationMember } from '@hooks/query/organizations';
+
+const getOrganizationTabs = (id: string) => {
+
+  const organizationTabs: TabItemWithOrganizationRole[] = [
+    {
+      key: 'dashboard',
+      title: 'Dashboard',
+      route: `/organizations/${id}`,
+      roles: [OrganizationRole.org_admin, OrganizationRole.org_user]
+    },
+    {
+      key: 'members',
+      title: 'Members',
+      route: `/organizations/${id}/members`,
+      roles: [OrganizationRole.org_admin]
+    },
+    {
+      key: 'billing',
+      title: 'Billing',
+      route: `/organizations/${id}/billing`,
+      roles: [OrganizationRole.org_admin]
+    }
+  ]
+
+  return organizationTabs;
+}
+
 
 interface OrganizationLayoutProps {
   children: JSX.Element[] | JSX.Element;
   tab: string;
+}
+
+type TabItemWithOrganizationRole = TabItem & {
+  roles?: OrganizationRole[]
 }
 
 const OrganizationLayout = (props: OrganizationLayoutProps) => {
@@ -18,29 +51,16 @@ const OrganizationLayout = (props: OrganizationLayoutProps) => {
   const router = useRouter();
   const { organizationId } = router.query;
 
+  const { isLoading, data } = useOrganizationMember({ organizationId: organizationId as string });
 
-  const getOrganizationTabs = (id: string) => {
 
-    const organizationTabs: TabItem[] = [
-      {
-        key: 'dashboard',
-        title: 'Dashboard',
-        route: `/organizations/${id}`
-      },
-      {
-        key: 'members',
-        title: 'Members',
-        route: `/organizations/${id}/members`
-      },
-      {
-        key: 'billing',
-        title: 'Billing',
-        route: `/organizations/${id}/billing`
-      }
-    ]
-
-    return organizationTabs;
+  if (isLoading) {
+    return <>Loading....</>;
   }
+
+  const preparedTabs = getOrganizationTabs(organizationId as string).filter((item) => {
+    return item.roles ? item.roles.includes(data?.role as OrganizationRole): true;
+  });
 
   return (
     <Flex direction='col'>
@@ -48,7 +68,7 @@ const OrganizationLayout = (props: OrganizationLayoutProps) => {
         <IoReturnUpBackOutline className='text-2xl'/>
       </Link>
       <div className="flex flex-col flex-no-wrap">
-        <Tabs items={getOrganizationTabs(organizationId as string)} defaultTab={tab} />
+        <Tabs items={preparedTabs} defaultTab={tab} />
         {children}
       </div>
     </Flex>
