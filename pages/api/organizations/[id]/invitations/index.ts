@@ -8,6 +8,9 @@ import {
   OrganizationMemberInviteFormValues 
 } from '@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm';
 import jwt from 'jsonwebtoken';
+import mail from '@lib/email';
+import OrganizationInviteTeamMemberEmail from '@lib/email/templates/OrganisationInviteTeamMember';
+import { render } from '@react-email/render';
 
 export interface OrganizationInvitationMemberData {
   id: number;
@@ -79,6 +82,19 @@ handler.post(async(
     organizationId: id,
   };
 
+  const isInvitationAlreadySent = await prisma.organizationMemberInvitation.findUnique({
+    where: {
+      email_organizationId: {
+        email: body.email,
+        organizationId: id,
+      }
+    }
+  });
+
+  if (isInvitationAlreadySent) {
+    return res.status(400).json({ message: 'invitation already sent'  });
+  }
+
   const now = new Date();
   const expiresInMs = 60 * 60 * 1000; // 1 hour in milliseconds
   const expiresAt = new Date(now.getTime() + expiresInMs);
@@ -94,6 +110,13 @@ handler.post(async(
     }
   });
 
+  const preparedUrl = `${process.env.NEXTAUTH_URL}/invitation?token=${token}`;
+
+  await mail.sendEmail({
+    to: body.email,
+    subject: 'Organization Invitaion',
+    body: render(OrganizationInviteTeamMemberEmail({ url: preparedUrl })),
+  });
 
   res.status(200).json({ message: 'invitation sent'  });
 })

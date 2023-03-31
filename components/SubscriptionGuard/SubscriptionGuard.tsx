@@ -31,26 +31,22 @@ const SubscriptionGuard: React.FC<SubscriptionGuardProps> = (props: Subscription
 
   if (!plans) return <>{children}</>;
 
-  if (!data.subscription)  {
-    router.replace("/pricing");
-    return <></>;
+  if (data.subscription) {
+    const { product } = data.subscription;
+    if (plans.some((plan) => plan?.includes(product.uniqueIdentifier))) {
+      return <>{children}</>;
+    }
   }
 
-  const { product } = data.subscription;
-  if (plans.some((plan) => plan?.includes(product.uniqueIdentifier))) {
+  if (session?.user.isOrganizationUser || plans.includes(SUBSCRIPTION_PLAN.TEAMS)) {
     return <>{children}</>;
-  } else {
-
-    if (session?.user.isOrganizationUser && plans.includes(SUBSCRIPTION_PLAN.TEAMS)) {
-      return <>{children}</>;
-    }
-
-    if (session?.user.role === Role.superadmin) {
-      return <>{children}</>;
-    }
-    router.replace("/pricing");
-    return <></>;
   }
+
+  if (session?.user.role === Role.superadmin) {
+    return <>{children}</>;
+  }
+  router.replace("/pricing");
+  return <></>;
 };
 
 

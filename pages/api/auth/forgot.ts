@@ -3,6 +3,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import nc from "next-connect";
 
 import { User } from "@prisma/client";
+import mail from "@lib/email";
+import { render } from "@react-email/render";
+import ResetPasswordEmail from "@lib/email/templates/ResetPassword";
 
 interface ForgotApiRequest extends NextApiRequest {
   body: {
@@ -34,6 +37,14 @@ handler.post(async (req: ForgotApiRequest, res: NextApiResponse) => {
         expires: expirationTime,
         user: { connect: { id: existingUser.id } },
       },
+    });
+
+    const resetPasswordLink = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
+
+    await mail.sendEmail({
+      to: email,
+      subject: 'Reset Password Request',
+      body: render(ResetPasswordEmail({ resetPasswordLink })),
     });
 
     res.status(200).json({ name: "Password reset link sent to your mail" });

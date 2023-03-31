@@ -14,6 +14,7 @@ const UserCard: React.FC<UserCardProps> = (props: UserCardProps) => {
       <div className="flex items-center md:order-2">
         <Popover.Root>
           <Popover.Trigger asChild>
+            <div className='flex flex-col justify-center items-center'>
             <button className="flex justify-between w-full items-center">
               <span className="sr-only">Open user menu</span>
               <div className="px-4 flex flex-col items-center py-3">
@@ -23,6 +24,12 @@ const UserCard: React.FC<UserCardProps> = (props: UserCardProps) => {
               {session?.user.image && <img className="w-8 h-8 rounded-full" src={session?.user.image} alt="user photo" />}
               {!session?.user.image && <RxAvatar className='w-8 h-8 text-white'/>}
             </button>
+           {session?.user.role === 'superadmin' && (
+              <div className='bg-white p-1 px-2 text-[0.6rem] rounded-sm'>
+                {session?.user.role}
+              </div>
+              )}
+            </div>
           </Popover.Trigger>
           <Popover.Portal >
             <Popover.Content align="end" side="top" sideOffset={0}>

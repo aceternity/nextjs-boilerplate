@@ -25,12 +25,32 @@ handler.get(async (
   req: PaginatedNextApiRequest & NextApiRequestWithSession,
   res: NextApiResponse<OrganizationsData>
 ) => {
-  const { query } = req;
+  const { query, session } = req;
   const { page } = query;
+  
+  const { user } = session;
+
+  let whereInput: Prisma.OrganizationWhereInput = {
+    users: {
+      some: {
+        
+      }
+    }
+  };
+
+  // if (user.role === Role.customer) {
+  // }
 
   const result = await paginate<OrganizationData, Prisma.OrganizationFindManyArgs>(
     prisma.organization,
     {
+      where: {
+        members: {
+          some: {
+            userId: user.id as string,
+          }
+        }
+      },
       select: {
         id: true,
         name: true,

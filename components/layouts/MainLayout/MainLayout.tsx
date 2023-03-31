@@ -12,10 +12,7 @@ import { TfiLayoutListThumb } from 'react-icons/tfi';
 
 import { FaRegListAlt } from 'react-icons/fa';
 
-import { RiLogoutCircleLine } from 'react-icons/ri';
-import { Button } from '@components/elements';
-import Flex from '@components/Flex';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { Role } from '@prisma/client';
 import UserCard from '@components/UserCard';
 

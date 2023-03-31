@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import Mail from 'nodemailer/lib/mailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import EmailProvider, { Email } from '../EmailProvider';
 
@@ -11,11 +12,11 @@ class SMTPProvider implements EmailProvider {
   }
 
   async sendEmail(email: Email): Promise<boolean> {
-    const data = {
+    const data: Mail.Options = {
       from: this.fromEmail, // replace with your email
       to: email.to,
       subject: email.subject,
-      text: email.body,
+      html: email.body,
     };
 
     try {

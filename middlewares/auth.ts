@@ -4,7 +4,7 @@ import { getSession } from 'next-auth/react'
 import { NextHandler } from 'next-connect'
 
 export type NextApiRequestWithSession = NextApiRequest & {
-  session: Session | null;
+  session: Session;
 };
 
 const AuthMiddleWare = (roles: string[]) => {
