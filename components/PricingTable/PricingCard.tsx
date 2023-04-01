@@ -22,7 +22,6 @@ const PricingCard = (props: PricingCardProps) => {
     }
   }
   let price = data.prices.find((price) => price.currency === currency && price.interval === interval);
-
   if (!price) {
     price = data.prices[0];
   }
