@@ -6,7 +6,7 @@ import nextConnect from 'next-connect';
 import { AuthMiddleWare, NextApiRequestWithSession } from 'middlewares/auth';
 
 export interface OrganizationMemberData {
-  id: number;
+  id: string;
   role: OrganizationRole;
   user: {
     name: string;

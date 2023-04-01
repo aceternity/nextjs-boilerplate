@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
+import { useForm, FormProvider, Controller, UseFormReturn } from 'react-hook-form';
 import useYupValidationResolver from '@hooks/useYupValidationResolver';
 import * as yup from 'yup';
 import { Button, Input } from '@components/elements';
@@ -9,7 +9,7 @@ export type OrganizationMemberInviteFormValues = {
 };
 
 interface OrganizationMemberInviteFormProps {
-  onSubmit: (updatedValues: OrganizationMemberInviteFormValues) => void;
+  onSubmit: (updatedValues: OrganizationMemberInviteFormValues,  formInstance: UseFormReturn<OrganizationMemberInviteFormValues, any>) => void;
   loading?: boolean;
 }
 
@@ -26,9 +26,13 @@ const OrganizationMemberInviteForm: React.FC<OrganizationMemberInviteFormProps> 
     resolver
   });
 
+  const handleSubmit = (values: OrganizationMemberInviteFormValues) => {
+    onSubmit(values, methods);
+  }
+
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
+      <form onSubmit={methods.handleSubmit(handleSubmit)}>
         <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
           <div>
             <Controller
@@ -48,8 +52,8 @@ const OrganizationMemberInviteForm: React.FC<OrganizationMemberInviteFormProps> 
                 )}
               />
           </div>
+         <Button classes="w-full" size="xs" type="submit" disabled={loading}>{loading ? 'Please wait...': 'Invite'}</Button>
         </div>
-         <Button classes="w-full" size="xs" type="submit" disabled={loading}>Save</Button>
       </form>
     </FormProvider>
   );

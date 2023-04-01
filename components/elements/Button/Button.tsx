@@ -31,7 +31,7 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
   const getSizeClasses = () => {
     switch (size) {
       case 'xs':
-        return 'px-2 text-xs';
+        return 'px-2 py-[0.3rem] text-xs';
       case 'sm':
         return 'px-2 py-1 text-sm';
       case 'lg':
@@ -50,8 +50,8 @@ const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
         classes,
         `px-4 py-2 rounded-md flex justify-center items-center gap-1 font-medium transition duration-200 focus:outline-none`,
         getVariantClasses(),
-        getSizeClasses(),
         fullWidth ? 'w-full': 'w-fit',
+        getSizeClasses(),
       )}
     >
       {children}

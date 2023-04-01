@@ -1,6 +1,5 @@
 import EmailProvider, { Email } from "./EmailProvider";
 
-// import MailgunProvider from "./providers/MailgunProvider";
 import SMTPProvider from "./providers/SMTPProvider";
 
 class EmailService {

@@ -1,16 +1,19 @@
 import AxoisClient from "@lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { OrganizationsData } from "@pages/api/organizations";
 import { AxiosResponse } from "axios";
 import { useRouter } from "next/router";
-import { OrganizationFormValues } from "@components/forms/OrganizationForm/OrganizationForm";
 import { toast } from "react-hot-toast";
 import { queryClient } from "@pages/_app";
+
+import { OrganizationsData } from "@pages/api/organizations";
 import { OrganizationSubscription } from "@pages/api/organizations/[id]/subscription";
 import { OrganizationMembersData } from "@pages/api/organizations/[id]/members";
 import { OrganizationInvitationsMembersData } from "@pages/api/organizations/[id]/invitations";
-import { OrganizationMemberInviteFormValues } from "@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm";
 import { OrganizationMemberData } from "@pages/api/organizations/[id]/member";
+
+import { OrganizationFormValues } from "@components/forms/OrganizationForm/OrganizationForm";
+import { OrganizationMemberInviteFormValues } from "@components/forms/OrganizationMemberInviteForm/OrganizationMemberInviteForm";
+import { UseFormReturn } from "react-hook-form";
 
 const useOrganizations = () => {
   const { data, isLoading, error } = useQuery(
@@ -144,18 +147,61 @@ export interface useInviteMemberToOrganizationProps {
   organizationId: string;
 }
 const useInviteMemberToOrganization = ({ organizationId }: useInviteMemberToOrganizationProps) => {
-  const router = useRouter();
   const { mutateAsync, isLoading, error, status } = useMutation(
     async (data: OrganizationMemberInviteFormValues) => {
-      return AxoisClient.getInstance().post(`api/organizations/${organizationId}/invitations`, { ...data });
+      return AxoisClient.getInstance().post(`api/organizations/${organizationId}/invitations/send`, { ...data });
     }
   );
 
-  const invite = async (data: OrganizationMemberInviteFormValues) => {
+  const invite = async (
+    data: OrganizationMemberInviteFormValues,
+    formInstance: UseFormReturn<OrganizationMemberInviteFormValues, any>,
+    setInviteForm: React.Dispatch<React.SetStateAction<boolean>> | undefined
+    ) => {
     const promise = mutateAsync(data);
     toast.promise(promise, {
       loading: 'Please wait...',
       success: 'Member invited Successfully',
+      error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
+    }).then(async (value) => {
+      if (value.status === 200) {
+        setInviteForm && setInviteForm(false);
+        formInstance.reset();
+        await queryClient.invalidateQueries([`${organizationId}_invitations`]);
+      }
+    }).catch(() => {
+    });
+  };
+
+  return {
+    invite,
+    isLoading,
+    error,
+    status,
+  };
+}
+
+export interface useCancelMemberInvitationProps {
+  organizationId: string;
+}
+
+interface CancelInvitation {
+  invitationId: string;
+}
+
+const useCancelMemberInvitation = ({ organizationId }: useCancelMemberInvitationProps) => {
+
+  const { mutateAsync, isLoading: isCancelLoading, error, status } = useMutation(
+    async (data: CancelInvitation) => {
+      return AxoisClient.getInstance().post(`api/organizations/${organizationId}/invitations/cancel`, { ...data });
+    }
+  );
+
+  const cancelInvitation = async (data: CancelInvitation) => {
+    const promise = mutateAsync(data);
+    toast.promise(promise, {
+      loading: 'Please wait...',
+      success: 'Member inivitation canceled Successfully',
       error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
     }).then(async (value) => {
       if (value.status === 200) {
@@ -166,8 +212,8 @@ const useInviteMemberToOrganization = ({ organizationId }: useInviteMemberToOrga
   };
 
   return {
-    invite,
-    isLoading,
+    cancelInvitation,
+    isCancelLoading,
     error,
     status,
   };
@@ -235,6 +281,41 @@ const useOrganizationMember = ({ organizationId }: useOrganizationSubscriptionPr
   };
 };
 
+export interface useRemoveOrganizationMemberProps {
+  organizationId: string;
+  memberId: string;
+}
+const useRemoveOrganizationMember = ({ organizationId, memberId }: useRemoveOrganizationMemberProps) => {
+  const router = useRouter();
+  const { mutateAsync, isLoading, error, status } = useMutation(
+    async () => {
+      return AxoisClient.getInstance().delete(`api/organizations/${organizationId}/members/${memberId}`);
+    }
+  );
+
+  const remove = async () => {
+    const promise = mutateAsync();
+    toast.promise(promise, {
+      loading: 'Please wait...',
+      success: 'Member deleted Successfully',
+      error: (err) => `${err?.response?.data?.message || err || 'something went wrong!'}`,
+    }).then(async (value) => {
+      if (value.status === 200) {
+        await queryClient.invalidateQueries([`${organizationId}_members`]);
+      }
+    }).catch(() => {
+      router.replace(`/dashboard`);
+    });
+  };
+
+  return {
+    remove,
+    isLoading,
+    error,
+    status,
+  };
+};
+
 export {
   useOrganizationSubscription,
   useOrganizations,
@@ -244,4 +325,6 @@ export {
   useInviteMemberToOrganization,
   useAcceptInvitation,
   useOrganizationMember,
+  useCancelMemberInvitation,
+  useRemoveOrganizationMember,
 };
