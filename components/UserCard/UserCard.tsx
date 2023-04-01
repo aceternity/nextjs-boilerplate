@@ -10,14 +10,13 @@ interface UserCardProps {
 const UserCard: React.FC<UserCardProps> = (props: UserCardProps) => {
   const { data: session } = useSession();
   return (
-      <div className="container flex flex-wrap items-center justify-between mx-auto">
-      <div className="flex items-center md:order-2">
+      <div className="container mx-auto">
         <Popover.Root>
           <Popover.Trigger asChild>
-            <div className='flex flex-col justify-center items-center'>
+            <div className="bg-primary-800 p-1 rounded-md">
             <button className="flex justify-between w-full items-center">
               <span className="sr-only">Open user menu</span>
-              <div className="px-4 flex flex-col items-center py-3">
+              <div className="px-2 flex flex-col text-left py-3">
                 <span className="block text-gray-300 text-sm">{session?.user.name}</span>
                 <span className="block font-medium truncate text-gray-300 text-[0.6rem]">{session?.user.email}</span>
               </div>
@@ -25,7 +24,7 @@ const UserCard: React.FC<UserCardProps> = (props: UserCardProps) => {
               {!session?.user.image && <RxAvatar className='w-8 h-8 text-white'/>}
             </button>
            {session?.user.role === 'superadmin' && (
-              <div className='bg-white p-1 px-2 text-[0.6rem] rounded-sm'>
+              <div className='bg-white p-1 px-2 text-[0.6rem] text-center rounded-sm'>
                 {session?.user.role}
               </div>
               )}
@@ -47,7 +46,6 @@ const UserCard: React.FC<UserCardProps> = (props: UserCardProps) => {
           </Popover.Portal>
           </Popover.Root>
         
-      </div>
       </div>
   );
 };

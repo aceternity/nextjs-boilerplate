@@ -19,6 +19,7 @@ import UserCard from '@components/UserCard';
 import { CgMenuLeftAlt } from 'react-icons/cg';
 import useOnClickOutside from '@hooks/useOnClickOutside';
 import classNames from 'classnames';
+import Logo from '@components/Logo';
 
 type MenuWithRole = IMenuItem & {
   roles?: Role[]
@@ -90,24 +91,27 @@ const MainLayout = (props: MainLayoutProps) => {
   const { children } = props;
   return (
     <div className="flex flex-no-wrap h-screen">
-      <div className="w-64 absolute sm:relative bg-gray-800 shadow md:h-full flex-col justify-between hidden sm:flex">
+      <div className="w-64 absolute sm:relative bg-grey-100 shadow md:h-full flex-col justify-between hidden sm:flex">
           <div className="px-2">
-              <div className="h-16 mb-10 justify-center text-white text-2xl text-center w-full flex items-center">
-                  LOGO
+              <div className="h-16 mb-10 flex justify-center items-center">
+                <Logo />
               </div>
               <Menu items={preparedMenu} />
           </div>
-          <div className="flex items-center flex-col py-4 pr-4 justify-center border-gray-700">
+          <div className="p-1 border-gray-700">
               <UserCard />
           </div>
       </div>
       <div ref={ref} className={
         classNames(
-          "w-64 h-screen absolute p-4 z-4 overflow-hidden bg-gray-800 shadow md:h-full flex-col justify-between sm:hidden  transition duration-150 ease-in-out",
+          "w-64 h-screen absolute p-4 z-4 overflow-hidden bg-white dark:bg-gray-800 shadow-2xl md:h-full flex-col justify-between sm:hidden  transition duration-150 ease-in-out",
           menuOpen ? '': 'hidden'
         )}>
+          <div className="h-16 mb-10 flex justify-center items-center">
+            <Logo />
+          </div>
          <Menu items={preparedMenu} />
-         <div className='absolute bottom-0'>
+         <div className='absolute bottom-1 left-1 right-1'>
             <UserCard />
           </div>
       </div>
@@ -115,7 +119,7 @@ const MainLayout = (props: MainLayoutProps) => {
         <div className={
            classNames(
             'h-12 p-4 z-0 flex sticky items-center',
-            menuOpen ? 'hidden': ''
+            menuOpen ? 'invisible': ''
            )}>
           <CgMenuLeftAlt className="cursor-pointer text-lg" onClick={() => setMenuOpen(true)}/>
         </div>

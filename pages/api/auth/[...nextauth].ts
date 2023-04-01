@@ -52,6 +52,9 @@ export const nextAuthOptions: NextAuthOptions = {
           }
         }
       });
+
+      session.user.isOrganizationAdmin = user?.memberInOrganizations.findIndex((org) => org.role === 'org_admin') !== -1;
+
       // if member detail registered as OrganizationMember it will be true
       session.user.isOrganizationUser = user?.memberInOrganizations && user?.memberInOrganizations.length > 0;
 

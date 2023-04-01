@@ -1,4 +1,5 @@
 /* PLOP_INJECT_IMPORT */
+import Logo from './Logo';
 import UserCard from './UserCard';
 import DialogComponent from './DialogComponent';
 import CurrentPlanCard from './CurrentPlanCard';
@@ -16,6 +17,7 @@ import AuthLayout from './layouts/AuthLayout';
 
 export {
   /* PLOP_INJECT_EXPORT */
+	Logo,
 	UserCard,
 	DialogComponent,
 	CurrentPlanCard,

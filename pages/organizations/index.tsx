@@ -9,9 +9,11 @@ import { OrganizationForm } from '@components/forms';
 import { useCreateOrganization, useOrganizations } from '@hooks/query/organizations';
 import { OrganizationData } from '@pages/api/organizations';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 const Organizations: NextPageWithProps = () => {
   const { data } = useOrganizations();
+  const { data: sessionData } = useSession();
 
   const [open, setOpen] = useState(false);
   const { createOrganization, isLoading: createLoading } = useCreateOrganization();
@@ -42,11 +44,14 @@ const Organizations: NextPageWithProps = () => {
   return (
     <MainLayout>
       <Flex gap='2' direction="col">
-        <div className='flex justify-end'>
-          <DialogComponent onOpenChange={setOpen} open={open} buttonText="Add new Organization">
-              <OrganizationForm onSubmit={(e) => createOrganization(e, setOpen)} loading={createLoading} />
-          </DialogComponent>
-        </div>
+        {
+          sessionData?.user.isOrganizationAdmin &&
+          <div className='flex justify-end'>
+            <DialogComponent onOpenChange={setOpen} open={open} buttonText="Add new Organization">
+                <OrganizationForm onSubmit={(e) => createOrganization(e, setOpen)} loading={createLoading} />
+            </DialogComponent>
+          </div>
+        }
         <Table
           title="Organizations"
           caption=""
