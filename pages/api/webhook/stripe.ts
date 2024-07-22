@@ -18,9 +18,12 @@ export default async function handleStripeWebhook(
       sig,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
-    
+
     await prisma.$transaction(async (prismaTrasaction) => {
       await stripeInstace.handleEvent(prismaTrasaction, event);
+    },  {
+      maxWait: 10000, // 5 seconds max wait to connect to prisma
+      timeout: 30000, // 20 seconds
     });
     res.status(200).send('OK');
   } catch(e: any) {

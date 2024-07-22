@@ -32,7 +32,7 @@ const validationSchema: yup.ObjectSchema<RegisterFormValues> = yup.object({
 const RegisterForm: React.FC<RegisterFormProps> = (props: RegisterFormProps) => {
   const router = useRouter();
   const { redirect } = router.query;
-  const defaultRedirect = redirect ? `/login?redirect=${redirect}` : '/login';
+  const defaultRedirect = redirect ? redirect as string : '/login';
 
   const resolver = useYupValidationResolver(validationSchema);
   const { loading, onSubmit, providers } = props;

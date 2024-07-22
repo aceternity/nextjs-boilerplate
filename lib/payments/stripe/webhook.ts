@@ -107,7 +107,7 @@ export default class StripeWebhook {
         })
         break;
       }
-      
+
       case 'price.deleted':  {
         const price = event.data.object as Stripe.Price;
         await prisma.productPrice.delete({

@@ -11,7 +11,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <h1>Next.js Serverless Boilerplate</h1>
-      <PricingComponent />
+      <PricingComponent isCreateOrganization />
     </div>
   )
 }

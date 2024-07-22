@@ -31,7 +31,7 @@ const PricingComponent: React.FC<PricingComponentProps> = (props: PricingCompone
   const [loading, setLoading] = useState(false);
 
   const onClickSubscribe = async (priceId: string | undefined, uniqueIdentifier: string) => {
-
+    console.log(priceId, uniqueIdentifier);
     if (!authSession) {
       router.replace('/auth/login?redirect=/pricing');
       return;
